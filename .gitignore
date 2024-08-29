@@ -1,6 +1,13 @@
 .AppleDouble
+.build/
 .DS_Store
 .LSOverride
 .TemporaryItems
 .Trashes
+*.dSYM
+*.dSYM.zip
+*.hmap
 *.icloud
+*.ipa
+DerivedData/
+xcuserdata/

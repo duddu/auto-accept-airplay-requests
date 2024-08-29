@@ -1,1 +1,3 @@
-# auto-accept-airplay-notifications
+# auto-accept-airplay-requests
+
+(_coming soon..._)
