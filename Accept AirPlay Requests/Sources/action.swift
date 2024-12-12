@@ -1,20 +1,7 @@
 import AppKit.NSApplication
 
 public struct AARActionManager {
-  static public func initialize() {
-    Task {
-      repeat {
-        if await AARSecurityManager.hasAccessibilityAccess {
-          acceptAirPlayRequest()
-        } else {
-          if await !AARSecurityManager.isBusy {
-            await AARSecurityManager.ensureAccessibilityAccess()
-          }
-        }
-        try? await Task.sleep(for: .seconds(5))
-      } while true
-    }
-  }
+  static private let logger = AARLogger.withCategory("action")
 
   static private func getApplicationElement(for bundleId: String) -> AXUIElement? {
     guard
@@ -22,7 +9,7 @@ public struct AARActionManager {
         $0.bundleIdentifier == bundleId
       })
     else {
-      print("App with bundle id \(bundleId) is not running.")
+      logger.debug("No app running with bundle id \(bundleId).")
       return nil
     }
     return AXUIElementCreateApplication(runningApp.processIdentifier)
@@ -31,80 +18,94 @@ public struct AARActionManager {
   static private func getApplicationFirstWindow(of appElement: AXUIElement) -> AXUIElement? {
     var windowsArray: CFTypeRef?
     AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &windowsArray)
+
     guard let windows = windowsArray as? [AXUIElement], !windows.isEmpty
     else {
-      print("No windows found for the application.")
+      logger.debug("No windows opened for this application.")
       return nil
     }
     return windows.first
   }
 
-  static private func inspectElementChildren(of element: AXUIElement) {
+  static private func inspectElementChildren(of element: AXUIElement) -> [AXUIElement]? {
     var childrenArray: CFTypeRef?
     AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &childrenArray)
 
-    guard let children = childrenArray as? [AXUIElement] else { return }
+    guard let children = childrenArray as? [AXUIElement] else { return nil }
 
     for child in children {
       var actionNamesArray: CFArray?
       AXUIElementCopyActionNames(child, &actionNamesArray)
 
-      guard let actionNames = actionNamesArray as? [String] else { return }
+      guard
+        let actionNames = actionNamesArray as? [String],
 
-      // @TODO swap from Slose to Accept action name and description
-      let closeActionNames = actionNames.filter({ name in
-        return name.starts(with: "Name:Close")
-      })
+        let acceptActionNames = actionNames.filter({ name in
+          guard name.starts(with: "Name:Accept") else { return false }
 
-      for closeActionName in closeActionNames {
-        var description: CFString?
-        AXUIElementCopyActionDescription(child, closeActionName as CFString, &description)
+          var description: CFString?
+          AXUIElementCopyActionDescription(child, name as CFString, &description)
+          guard description as? String == "Accept" else { return false }
 
-        if let closeActionDescription = description as? String, closeActionDescription == "Close" {
-//          let attrs = _getAXUIElementAttributesValues(of: child)
-//          print("\(closeActionDescription) -- \(attrs)")
+          return inspectElementAttrs(of: child)
+        }) as [CFString]?,
 
-          AXUIElementPerformAction(child, closeActionName as CFString)
-          return
-        }
+        !acceptActionNames.isEmpty
+      else {
+        return inspectElementChildren(of: child)
       }
 
-      inspectElementChildren(of: child)
+      for name in acceptActionNames {
+        AXUIElementPerformAction(child, name)
+      }
     }
+
+    return nil
   }
 
-  static private func inspectElementAttrs(of element: AXUIElement) -> String? {
+  static private func inspectElementAttrs(of element: AXUIElement) -> Bool {
+    // @TODO copy and inspect attrs relevant for each macOS version
+    let attrsNames = [
+      kAXDescription,
+      kAXIdentifierAttribute,
+      kAXRoleAttribute,
+      kAXSubroleAttribute,
+      kAXValueAttribute,
+    ] as CFArray
     var attrsValues: CFArray?
-    if AXUIElementCopyMultipleAttributeValues(
-      element,
-      [
-        kAXIdentifierAttribute, kAXRoleAttribute, kAXSubroleAttribute,
-        kAXValueAttribute, kAXDescription,
-      ] as CFArray, AXCopyMultipleAttributeOptions(), &attrsValues)
-      == .success
-    {
-      // @TODO if attrValues contain right strings
-      return attrsValues.debugDescription.replacingOccurrences(
-        of: "\n", with: " # ")
-    } else {
-      print("Failed to retrieve attrValues.")
-      return nil
+    AXUIElementCopyMultipleAttributeValues(
+      element, attrsNames, AXCopyMultipleAttributeOptions(), &attrsValues
+    )
+
+    guard
+      let values = attrsValues as? [AnyObject],
+      values.contains(where: { value in
+        String(describing: value).contains(/^AirPlay.+would like to AirPlay to.+/)
+      }) || values.count(where: { value in
+        return value as? String == "AirPlay" || value.contains("would like to AirPlay to")
+      }) >= 2
+    else {
+      logger.debug("Attribute values criteria not met.\n \(attrsValues.debugDescription)")
+      return false
     }
+
+    return true
   }
 
-  static private func acceptAirPlayRequest() {
-    guard let notificationCenterApp = getApplicationElement(for: "com.apple.notificationcenterui")
-    else {
-      print("getApplicationElement failed")
-      return
-    }
+  //  Optional(<__NSArrayM 0x60000054d470>(
+  //    AirPlay, AIRPLAY, “DDiPhone16Pro” would like to AirPlay to this Mac.,
+  //    26C8EB21-9D81-482A-A932-6366512E2EE6,
+  //    AXGroup,
+  //    AXNotificationCenterAlert,
+  //    <AXValue 0x600000b5b000> {value = error:-25212 type = kAXValueAXErrorType}
+  //  ))
 
-    guard let notificationCenterWindow = getApplicationFirstWindow(of: notificationCenterApp)
-    else {
-      print("getFirstWindow failed")
-      return
-    }
+  static public func inspectAirPlayRequestNotifications() {
+    guard
+      let notificationCenterApp = getApplicationElement(for: "com.apple.notificationcenterui"),
+      let notificationCenterWindow = getApplicationFirstWindow(of: notificationCenterApp)
+    else { return }
 
-    inspectElementChildren(of: notificationCenterWindow)
+    _ = inspectElementChildren(of: notificationCenterWindow)
   }
 }

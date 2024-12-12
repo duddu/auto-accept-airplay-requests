@@ -4,52 +4,51 @@ import ServiceManagement.SMAppService
 @MainActor public struct AARAgentManager {
   static private var service: SMAppService { .agent(plistName: "LaunchAgent.plist") }
 
-  static public func initialize() {
-    ensureServiceStatus()
-  }
-
   static private func displayErrorAndExit(
-    title: String, message: String, onBeforeExit block: (() -> Void)? = nil
+    title: String = "SMAppService agent status error",
+    message: String,
+    onBeforeExit: (() -> Void)? = nil
   ) {
     _ = AARAlert(style: .critical, title: title, message: message).run()
-    if let block { block() }
+    if let onBeforeExit { onBeforeExit() }
     return NSApp.terminate(self)
   }
 
-  static private func tryRegisterService(errorTitle: String, errorMessage: String) {
+  static private func tryServiceRegistration(errorMessage: String) {
     do {
       try service.register()
       return NSApp.terminate(self)
-    } catch let error {
+    } catch let registrationError {
       return displayErrorAndExit(
-        title: errorTitle,
-        message: "\(errorMessage) -- Registration Error: \(error)"
+        title: "tryServiceRegistration() - \(registrationError)",
+        message: errorMessage
       )
     }
   }
 
-  static private func ensureServiceStatus() {
+  static public func ensureServiceStatus() {
+    // @TODO handle manual opening outside launchd
     switch service.status {
       case .enabled: break
+
       case .requiresApproval:
         return displayErrorAndExit(
-          title: "SMAppService agent status error",
           message: "requiresApproval",
           onBeforeExit: SMAppService.openSystemSettingsLoginItems
         )
+
       case .notRegistered:
-        return tryRegisterService(
-          errorTitle: "SMAppService registration error",
+        return tryServiceRegistration(
           errorMessage: "notRegistered"
         )
+
       case .notFound:
-        return tryRegisterService(
-          errorTitle: "SMAppService agent status error",
+        return tryServiceRegistration(
           errorMessage: "notFound"
         )
+
       default:
-        return tryRegisterService(
-          errorTitle: "SMAppService agent status error",
+        return tryServiceRegistration(
           errorMessage: "unknown"
         )
     }
