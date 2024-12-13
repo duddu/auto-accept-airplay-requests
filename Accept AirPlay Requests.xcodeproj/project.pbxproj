@@ -46,7 +46,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4DBF74AD2D0AF0EF00926704 /* Exceptions for "Resources" folder in "Accept AirPlay Requests" target */ = {
+		4DBF74AD2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Accept AirPlay Requests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -57,7 +57,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		4DBF74AE2D0AF0EF00926704 /* Exceptions for "Resources" folder in "Copy Files" phase from "Accept AirPlay Requests" target */ = {
+		4DBF74AE2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Copy Files" phase from "Accept AirPlay Requests" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			attributesByRelativePath = {
 				LaunchAgent.plist = (CodeSignOnCopy, );
@@ -70,13 +70,13 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4DBF74AC2D0AF0D200926704 /* Resources */ = {
+		4DBF74AC2D0AF0D200926704 /* Assets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4DBF74AD2D0AF0EF00926704 /* Exceptions for "Resources" folder in "Accept AirPlay Requests" target */,
-				4DBF74AE2D0AF0EF00926704 /* Exceptions for "Resources" folder in "Copy Files" phase from "Accept AirPlay Requests" target */,
+				4DBF74AD2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Accept AirPlay Requests" target */,
+				4DBF74AE2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Copy Files" phase from "Accept AirPlay Requests" target */,
 			);
-			path = Resources;
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -97,7 +97,7 @@
 			children = (
 				4D74AC782CA37E120013FA58 /* Accept AirPlay Requests */,
 				4D9EC9662C9B5D9B00D8B522 /* Accept AirPlay Requests */,
-				4DBF74AC2D0AF0D200926704 /* Resources */,
+				4DBF74AC2D0AF0D200926704 /* Assets */,
 				4D74AC7E2CB846A90013FA58 /* .czrc */,
 				4D74AC7F2CB846A90013FA58 /* .editorconfig */,
 				4D74AC802CB846A90013FA58 /* .gitignore */,
@@ -134,7 +134,7 @@
 				4D99B2922CA2E35100E7EC6F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				4DBF74AC2D0AF0D200926704 /* Resources */,
+				4DBF74AC2D0AF0D200926704 /* Assets */,
 			);
 			name = "Accept AirPlay Requests";
 			packageProductDependencies = (
@@ -330,7 +330,7 @@
 				COPYING_PRESERVES_HFS_DATA = NO;
 				COPY_PHASE_STRIP = NO;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 2412120358;
+				CURRENT_PROJECT_VERSION = 241213018;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 82FJB5QMSS;
@@ -357,13 +357,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = Assets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Accept AirPlay Requests";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024 Davide Doronzo";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -429,7 +427,7 @@
 				COPYING_PRESERVES_HFS_DATA = NO;
 				COPY_PHASE_STRIP = NO;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 2412120358;
+				CURRENT_PROJECT_VERSION = 241213018;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 82FJB5QMSS;
@@ -450,13 +448,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = Assets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Accept AirPlay Requests";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024 Davide Doronzo";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
