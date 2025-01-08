@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>dev.duddu.accept-airplay-requests.launch-agent</string>
+	<string>dev.duddu.AcceptAirPlayRequests.LaunchAgent</string>
 	<key>AssociatedBundleIdentifiers</key>
-	<string>dev.duddu.accept-airplay-requests</string>
+	<string>dev.duddu.AcceptAirPlayRequests</string>
 	<key>BundleProgram</key>
 	<string>Contents/MacOS/Accept AirPlay Requests</string>
 	<key>ProcessType</key>

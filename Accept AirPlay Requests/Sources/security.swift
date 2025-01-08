@@ -1,37 +1,54 @@
 import AppKit.NSApplication
+import AppKit.NSWorkspace
 
-public struct AARSecurityManager {
-  static private let privacyAccessibilityPanelUrl = URL(
-    string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-  )
-
-  @MainActor static private var isFirstAttempt: Bool = true
-
-  static private var isAccessibilityAccessGranted: Bool { AXIsProcessTrusted() }
-
-  @MainActor static private func displayAccessibilityWarning() -> AARAlertResult {
-    AARAlert(
-      style: .warning,
-      title: "AARSecurityManager",
-      message: isFirstAttempt
-        ? "Please enable accessibility access in Privacy & Security Preferences."
-        : "Accessibility access is still disabled.",
-      okBtnTitle: isFirstAttempt ? "Open System Preferences" : "Check again",
-      dismissBtnTitle: "Quit"
-    )
-    .run()
+//@MainActor
+public struct AARSecurityManager: AARLoggable {
+  @frozen public enum Result: Sendable {
+    case success
+    case failure(retry: Bool)
   }
 
-  @MainActor static public func ensureAccessibilityAccess() {
-    if isAccessibilityAccessGranted { return }
+//  public var isRetry = false
 
-    if displayAccessibilityWarning() != .ok {
-      return NSApp.terminate(self)
+//  public func run() async -> Result {
+//    await ensureAccessibilityPermission()
+//  }
+
+  //  @MainActor
+  public func ensureAccessibilityPermission(_ isRetry: Bool) async -> Result {
+    if AXIsProcessTrusted() {
+      Self.logger.debug("accessibility permission granted")
+      return .success
     }
 
-    if isFirstAttempt {
-      NSWorkspace.shared.open(privacyAccessibilityPanelUrl!)
-      isFirstAttempt = false
+    if await promptAccessibilityWarning(isRetry) != .OK {
+      Self.logger.error("accessibility permission prompt dismissed")
+      return .failure(retry: false)
     }
+
+    if !isRetry, let privacyAccessibilityPanelUrl = URL(
+      string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+    ) {
+      Self.logger.info("opening accessibility system settings")
+      NSWorkspace.shared.open(privacyAccessibilityPanelUrl)
+    }
+
+    Self.logger.error("accessibility permission not granted")
+    return .failure(retry: true)
+  }
+
+//  @TODO rename
+  private func promptAccessibilityWarning(_ isRetry: Bool) async -> NSApplication.ModalResponse {
+    var message = "This app needs permission to interact with the incoming AirPlay requests notifications. "
+    message += !isRetry
+      ? "Click the button below to open the Accessibility settings and authorize the app."
+      : "Please open System Settings > Privacy & Security > Accessibility and authorize the app. Then click the button below to let the app check again and validate."
+
+    return await AARAlert.warning(
+      title: "Accessibility permission required",
+      message: message,
+      okButtonTitle: !isRetry ? "Open System Settings" : "Check again now",
+      cancelButtonTitle: "Quit"
+    )
   }
 }

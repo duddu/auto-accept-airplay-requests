@@ -10,6 +10,8 @@
 		4D74AC792CA37E120013FA58 /* Accept AirPlay Requests in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D74AC782CA37E120013FA58 /* Accept AirPlay Requests */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4D74AC7C2CA389B70013FA58 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7A2CA389B70013FA58 /* LICENSE */; };
 		4D74AC7D2CA389B70013FA58 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7B2CA389B70013FA58 /* README.md */; };
+		4DA88C882D0BB6330096FB20 /* BundleIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4DA88C852D0BB6330096FB20 /* BundleIcon.icns */; };
+		4DA88C8B2D0BB6330096FB20 /* LaunchAgent.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DA88C872D0BB6330096FB20 /* LaunchAgent.plist */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -19,6 +21,7 @@
 			dstPath = Contents/Library/LaunchAgents;
 			dstSubfolderSpec = 1;
 			files = (
+				4DA88C8B2D0BB6330096FB20 /* LaunchAgent.plist in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,43 +46,10 @@
 		4D74AC802CB846A90013FA58 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		4D9EC9612C9B5D7C00D8B522 /* Accept AirPlay Requests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Accept AirPlay Requests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D9EC9662C9B5D9B00D8B522 /* Accept AirPlay Requests */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "Accept AirPlay Requests"; sourceTree = "<group>"; };
+		4DA88C852D0BB6330096FB20 /* BundleIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = BundleIcon.icns; sourceTree = "<group>"; };
+		4DA88C862D0BB6330096FB20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4DA88C872D0BB6330096FB20 /* LaunchAgent.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = LaunchAgent.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4DBF74AD2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Accept AirPlay Requests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-				LaunchAgent.plist,
-			);
-			target = 4D9EC9602C9B5D7C00D8B522 /* Accept AirPlay Requests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		4DBF74AE2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Copy Files" phase from "Accept AirPlay Requests" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			attributesByRelativePath = {
-				LaunchAgent.plist = (CodeSignOnCopy, );
-			};
-			buildPhase = 4D9EC97E2C9B97BA00D8B522 /* CopyFiles */;
-			membershipExceptions = (
-				LaunchAgent.plist,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		4DBF74AC2D0AF0D200926704 /* Assets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				4DBF74AD2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Accept AirPlay Requests" target */,
-				4DBF74AE2D0AF0EF00926704 /* Exceptions for "Assets" folder in "Copy Files" phase from "Accept AirPlay Requests" target */,
-			);
-			path = Assets;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4D9EC95E2C9B5D7C00D8B522 /* Frameworks */ = {
@@ -95,12 +65,14 @@
 		4D9EC9562C9B5D6000D8B522 = {
 			isa = PBXGroup;
 			children = (
-				4D74AC782CA37E120013FA58 /* Accept AirPlay Requests */,
 				4D9EC9662C9B5D9B00D8B522 /* Accept AirPlay Requests */,
-				4DBF74AC2D0AF0D200926704 /* Assets */,
+				4D74AC782CA37E120013FA58 /* Accept AirPlay Requests */,
 				4D74AC7E2CB846A90013FA58 /* .czrc */,
 				4D74AC7F2CB846A90013FA58 /* .editorconfig */,
 				4D74AC802CB846A90013FA58 /* .gitignore */,
+				4DA88C852D0BB6330096FB20 /* BundleIcon.icns */,
+				4DA88C862D0BB6330096FB20 /* Info.plist */,
+				4DA88C872D0BB6330096FB20 /* LaunchAgent.plist */,
 				4D74AC7A2CA389B70013FA58 /* LICENSE */,
 				4D74AC7B2CA389B70013FA58 /* README.md */,
 				4D9EC9622C9B5D7C00D8B522 /* Products */,
@@ -132,9 +104,6 @@
 			);
 			dependencies = (
 				4D99B2922CA2E35100E7EC6F /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4DBF74AC2D0AF0D200926704 /* Assets */,
 			);
 			name = "Accept AirPlay Requests";
 			packageProductDependencies = (
@@ -186,6 +155,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DA88C882D0BB6330096FB20 /* BundleIcon.icns in Resources */,
 				4D74AC7C2CA389B70013FA58 /* LICENSE in Resources */,
 				4D74AC7D2CA389B70013FA58 /* README.md in Resources */,
 			);
@@ -357,7 +327,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
-				INFOPLIST_FILE = Assets/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Accept AirPlay Requests";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -371,7 +341,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OSACOMPILE_EXECUTE_ONLY = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.duddu.accept-airplay-requests";
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.duddu.AcceptAirPlayRequests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
@@ -448,7 +418,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
-				INFOPLIST_FILE = Assets/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Accept AirPlay Requests";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -461,7 +431,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OSACOMPILE_EXECUTE_ONLY = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.duddu.accept-airplay-requests";
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.duddu.AcceptAirPlayRequests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
