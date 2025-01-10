@@ -28,9 +28,10 @@ public struct AARServiceManager: AARLoggable {
   private func handleBackgroundItem() async {
     Self.logger.error("background item disabled")
 
-    await displayError(
+    await displayAgentError(
       error: "Background item not allowed",
-      message: "This app needs to run in the background in order to accept incoming AirPlay requests on this computer.\nPlease enable this app's background item in System Settings > General > Login Items."
+      message:
+        "This app needs to run in the background in order to accept incoming AirPlay requests on this computer.\nPlease enable this app's background item in System Settings > General > Login Items."
     )
 
     SMAppService.openSystemSettingsLoginItems()
@@ -47,15 +48,16 @@ public struct AARServiceManager: AARLoggable {
     } catch let error {
       Self.logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
 
-      await displayError(
+      await displayAgentError(
         error: "Service registration failed",
-        message: "Unable to register the launch agent for managing this app in the background. Please check if it’s already registered or try again after restarting your computer.",
+        message:
+          "Unable to register the launch agent for managing this app in the background. Please check if it’s already registered or try again after restarting your computer.",
         cause: error
       )
     }
   }
 
-  private func displayError(
+  private func displayAgentError(
     error: String,
     message: String,
     cause: (any Error)? = nil

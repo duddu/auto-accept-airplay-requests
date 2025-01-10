@@ -1,20 +1,13 @@
 import AppKit.NSApplication
 import AppKit.NSWorkspace
+import ApplicationServices.HIServices
 
-//@MainActor
 public struct AARSecurityManager: AARLoggable {
   @frozen public enum Result: Sendable {
     case success
     case failure(retry: Bool)
   }
 
-//  public var isRetry = false
-
-//  public func run() async -> Result {
-//    await ensureAccessibilityPermission()
-//  }
-
-  //  @MainActor
   public func ensureAccessibilityPermission(_ isRetry: Bool) async -> Result {
     if AXIsProcessTrusted() {
       Self.logger.debug("accessibility permission granted")
@@ -26,9 +19,11 @@ public struct AARSecurityManager: AARLoggable {
       return .failure(retry: false)
     }
 
-    if !isRetry, let privacyAccessibilityPanelUrl = URL(
-      string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-    ) {
+    if !isRetry,
+      let privacyAccessibilityPanelUrl = URL(
+        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+      )
+    {
       Self.logger.info("opening accessibility system settings")
       NSWorkspace.shared.open(privacyAccessibilityPanelUrl)
     }
@@ -37,10 +32,11 @@ public struct AARSecurityManager: AARLoggable {
     return .failure(retry: true)
   }
 
-//  @TODO rename
   private func promptAccessibilityWarning(_ isRetry: Bool) async -> NSApplication.ModalResponse {
-    var message = "This app needs permission to interact with the incoming AirPlay requests notifications. "
-    message += !isRetry
+    var message =
+      "This app needs permission to interact with the incoming AirPlay requests notifications. "
+    message +=
+      !isRetry
       ? "Click the button below to open the Accessibility settings and authorize the app."
       : "Please open System Settings > Privacy & Security > Accessibility and authorize the app. Then click the button below to let the app check again and validate."
 
