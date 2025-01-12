@@ -17,7 +17,8 @@ public struct AARAlert {
   ) {
     alert = NSAlert()
     alert.alertStyle = style
-    alert.messageText = "\(Self.bundleName)\n\(title)"
+    alert.messageText = "\(Self.bundleName):\n\(title)"
+    // @TODO maybe move bundleName(+version) below message
     alert.informativeText = message
     alert.addButton(withTitle: okButtonTitle ?? "OK")
     if let cancelButtonTitle {
@@ -26,6 +27,7 @@ public struct AARAlert {
   }
 
   private func run() -> NSApplication.ModalResponse {
+    NSApplication.shared.setActivationPolicy(.regular)
     return alert.runModal() == .alertFirstButtonReturn ? .OK : .cancel
   }
 

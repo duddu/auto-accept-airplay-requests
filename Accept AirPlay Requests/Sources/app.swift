@@ -9,7 +9,7 @@ public final actor AARMain: GlobalActor, AARLoggable {
   private var task: Task<Void, Never>?
 
   public func start() {
-    Self.logger.info("starting")
+    logger.info("starting")
 
     task = Task(priority: .background) { @AARMain in
       await operation()
@@ -17,14 +17,14 @@ public final actor AARMain: GlobalActor, AARLoggable {
   }
 
   private func stop() async {
-    Self.logger.info("stopping")
+    logger.info("stopping")
 
     await withTaskCancellationHandler {
       task?.cancel()
     } onCancel: {
-      Self.logger.info("task cancelled")
-      Task {
-        await NSApp.terminate(self)
+      logger.info("task cancelled")
+      Task { @AARMain in
+        await NSApplication.shared.terminate(self)
       }
     }
   }
@@ -69,24 +69,48 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
   }
 
   func applicationDidFinishLaunching(_: Notification) {
-    Self.logger.debug("finish launching")
+    logger.debug("did finish launching")
     Task { @AARMain in
       await AARMain.shared.start()
     }
   }
 
   func applicationWillTerminate(_: Notification) {
-    Self.logger.debug("will terminate")
+    logger.debug("will terminate")
+  }
+
+  func applicationDidUpdate(_: Notification) {
+    if NSApplication.shared.windows.count > 0 {
+      NSApplication.shared.setActivationPolicy(.regular)
+      NSApplication.shared.activate(ignoringOtherApps: true)
+      NSApplication.shared.modalWindow?.makeKeyAndOrderFront(nil)
+      NSApplication.shared.modalWindow?.collectionBehavior = .moveToActiveSpace
+    } else {
+      NSApplication.shared.deactivate()
+      NSApplication.shared.setActivationPolicy(.accessory)
+    }
   }
 
   func applicationDidResignActive(_: Notification) {
-    if NSApplication.shared.windows.contains(where: { !$0.isOnActiveSpace }) {
-      Self.logger.debug("reactivate after resign")
+    logger.debug("reactivate after resign")
+    if NSApplication.shared.windows.count > 0 {
       NSApplication.shared.activate(ignoringOtherApps: true)
     }
   }
 
-  func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool { false }
+  func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
+    logger.debug("handle reopen")
+    // @TODO present user with info/options while process is already running
+    // (same to show when app is launched first time without launch agent registered)
+    if !hasVisibleWindows {
+      AARAlert.info(title: "", message: "This app is already running in the background")
+    }
+    return false
+  }
 
-  func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool { false }
+  // @TODO
+  // func application(_: NSApplication, willPresentError error: any Error) -> any Error {
+  //   logger.error("internal error: \(error, privacy: .public)")
+  //   return error
+  // }
 }
