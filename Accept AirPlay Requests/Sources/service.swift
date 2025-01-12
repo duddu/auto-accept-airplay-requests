@@ -9,7 +9,7 @@ public struct AARServiceManager: AARLoggable {
   }
 
   public func ensureAgentStatus() async -> Result {
-    Self.logger.debug("service status \(agent.status.rawValue)")
+    logger.debug("service status \(agent.status.rawValue)")
 
     switch agent.status {
       case .enabled:
@@ -26,7 +26,7 @@ public struct AARServiceManager: AARLoggable {
   }
 
   private func handleBackgroundItem() async {
-    Self.logger.error("background item disabled")
+    logger.error("background item disabled")
 
     await displayAgentError(
       error: "Background item not allowed",
@@ -38,15 +38,16 @@ public struct AARServiceManager: AARLoggable {
   }
 
   private func handleRegistration() async {
-    Self.logger.debug("try registration")
+    logger.debug("try registration")
 
     do {
-      // @TODO try? unregister first if status != .notRegistered
+      // @TODO try? await agent.unregister() first if status != .notRegistered
+      // @TODO provide a way to easily unregister (e.g. an alert button if status = .requiresApproval)
       try agent.register()
 
-      Self.logger.info("registration succeeded")
+      logger.info("registration succeeded")
     } catch let error {
-      Self.logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
+      logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
 
       await displayAgentError(
         error: "Service registration failed",

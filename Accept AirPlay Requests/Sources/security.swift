@@ -10,12 +10,12 @@ public struct AARSecurityManager: AARLoggable {
 
   public func ensureAccessibilityPermission(_ isRetry: Bool) async -> Result {
     if AXIsProcessTrusted() {
-      Self.logger.debug("accessibility permission granted")
+      logger.debug("accessibility permission granted")
       return .success
     }
 
     if await promptAccessibilityWarning(isRetry) != .OK {
-      Self.logger.error("accessibility permission prompt dismissed")
+      logger.error("accessibility permission prompt dismissed")
       return .failure(retry: false)
     }
 
@@ -24,11 +24,11 @@ public struct AARSecurityManager: AARLoggable {
         string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
       )
     {
-      Self.logger.info("opening accessibility system settings")
+      logger.info("opening accessibility system settings")
       NSWorkspace.shared.open(privacyAccessibilityPanelUrl)
     }
 
-    Self.logger.error("accessibility permission not granted")
+    logger.error("accessibility permission not granted")
     return .failure(retry: true)
   }
 
