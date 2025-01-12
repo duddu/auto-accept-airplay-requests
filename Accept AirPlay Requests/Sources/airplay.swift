@@ -3,28 +3,16 @@ import AppKit.NSRunningApplication
 import AppKit.NSWorkspace
 import ApplicationServices.HIServices
 
-public struct AARAirPlayManager: AARLoggable {
+public struct AARAirPlayRequestsHandler: AARLoggable {
   static private let notificationCenterBundleId = "com.apple.notificationcenterui"
 
-  private var notificationCenterWindow: AXUIElement? = nil
-
-  private typealias UIElementWithAction = (AXUIElement, CFString)
-
-  public init() {
-    self.notificationCenterWindow = getNotificationCenterFirstWindow()
+  public func scanNotificationCenter() {
+    if let notificationCenterWindow = getNotificationCenterFirstWindow() {
+      findAndActionAirPlayNotification(in: notificationCenterWindow)
+    }
   }
 
-  public func handleRequestNotification() {
-    guard
-      let notificationCenterWindow,
-      let (notification, actionName) = getNotificationAcceptAction(in: notificationCenterWindow),
-      AXUIElementPerformAction(notification, actionName) == .success
-    else { return }
-
-    Self.logger.info("action performed successfully")
-  }
-
-  private func getNotificationAcceptAction(in element: AXUIElement) -> UIElementWithAction? {
+  private func findAndActionAirPlayNotification(in element: AXUIElement) {
     for child in getUIElementChildren(of: element) {
       var actionNamesArray: CFArray?
       AXUIElementCopyActionNames(child, &actionNamesArray)
@@ -33,34 +21,35 @@ public struct AARAirPlayManager: AARLoggable {
 
       for name in actionNames {
         guard validateNotificationAction(of: child, name: name) else { continue }
-        Self.logger.info("action validation passed")
+        logger.info("action validation passed")
 
         guard validateNotificationAttributes(of: child) else { continue }
-        Self.logger.info("attributes validation passed")
-        return (child, name)
+        logger.info("attributes validation passed")
+
+        guard AXUIElementPerformAction(element, name) == .success else { continue }
+        logger.info("action performed successfully")
+        return
       }
 
       // @TODO avoid recurse here for known scenarios
-      return getNotificationAcceptAction(in: child)
+      return findAndActionAirPlayNotification(in: child)
     }
-
-    return nil
   }
 
   private func validateNotificationAction(of element: AXUIElement, name: CFString) -> Bool {
     guard String(describing: name).lowercased().starts(with: "name:accept") else { return false }
-    Self.logger.info("action name matched: \(String(describing: name), privacy: .public)")
+    logger.info("action name matched: \(String(describing: name), privacy: .public)")
 
     var description: CFString?
     AXUIElementCopyActionDescription(element, name, &description)
     guard let description = description as? String, description.lowercased() == "accept"
     else {
-      Self.logger.debug(
+      logger.debug(
         "action description not matched: \(String(describing: description), privacy: .public)"
       )
       return false
     }
-    Self.logger.info("action description match")
+    logger.info("action description match")
     return true
   }
 
@@ -69,9 +58,9 @@ public struct AARAirPlayManager: AARLoggable {
     AXUIElementCopyAttributeValue(element, kAXDescription as CFString, &description)
 
     guard let description = description as? String else { return false }
-    Self.logger.debug("attribute description: \(description, privacy: .public)")
+    logger.debug("attribute description: \(description, privacy: .public)")
 
-    // @TODO extract other regexs and strings in static lets
+    // @TODO extract other regexs and constants in string catalog
     if (try? (/^airplay.+would like to airplay to this mac\.$/.ignoresCase()).wholeMatch(
       in: description
     )) != nil {
@@ -87,7 +76,7 @@ public struct AARAirPlayManager: AARLoggable {
           let identifier = identifierRef as? String,
           identifier.lowercased() == "body"
         else {
-          Self.logger.debug(
+          logger.debug(
             "attribute identifier not matched: \(String(describing: identifierRef), privacy: .public)"
           )
           return false
@@ -101,7 +90,7 @@ public struct AARAirPlayManager: AARLoggable {
             in: value
           )
         else {
-          Self.logger.debug(
+          logger.debug(
             "attribute value not matched: \(String(describing: valueRef), privacy: .public)"
           )
           return false
@@ -117,7 +106,7 @@ public struct AARAirPlayManager: AARLoggable {
   private func getNotificationCenterFirstWindow() -> AXUIElement? {
     guard
       let notificationCenterUIElement = getApplicationUIElement(
-        for: AARAirPlayManager.notificationCenterBundleId)
+        for: AARAirPlayRequestsHandler.notificationCenterBundleId)
     else { return nil }
 
     var windowsRef: CFTypeRef?
@@ -127,7 +116,7 @@ public struct AARAirPlayManager: AARLoggable {
     guard
       let windows = windowsRef as? [AXUIElement], !windows.isEmpty
     else {
-      Self.logger.debug("notification center has no active windows")
+      logger.debug("notification center has no active windows")
       return nil
     }
 
@@ -140,7 +129,7 @@ public struct AARAirPlayManager: AARLoggable {
         where: { $0.bundleIdentifier == bundleId }
       )
     else {
-      Self.logger.error("app \(bundleId) not running")
+      logger.error("app \(bundleId) not running")
       return nil
     }
     return AXUIElementCreateApplication(runningApp.processIdentifier)
