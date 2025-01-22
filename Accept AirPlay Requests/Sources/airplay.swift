@@ -26,7 +26,13 @@ public struct AARAirPlayRequestsHandler: AARLoggable {
         guard validateNotificationAttributes(of: child) else { continue }
         logger.info("attributes validation passed")
 
-        guard AXUIElementPerformAction(element, name) == .success else { continue }
+        let performResult = AXUIElementPerformAction(child, name)
+        guard performResult == .success else {
+          logger.error(
+            "action perform failed (AXError code: \(performResult.rawValue, privacy: .public)"
+          )
+          continue
+        }
         logger.info("action performed successfully")
         return
       }
