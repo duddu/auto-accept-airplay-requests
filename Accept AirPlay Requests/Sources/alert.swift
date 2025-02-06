@@ -4,9 +4,8 @@ import Foundation.NSBundle
 
 @MainActor
 public struct AARAlert {
-  static private let bundleName = Bundle.main.infoDictionary![kCFBundleNameKey as String]!
-
   private let alert: NSAlert
+  private let footerText = "\(AARBundle.name)\nv\(AARBundle.version) (\(AARBundle.buildNumber))"
 
   private init(
     style: NSAlert.Style,
@@ -17,9 +16,8 @@ public struct AARAlert {
   ) {
     alert = NSAlert()
     alert.alertStyle = style
-    alert.messageText = "\(Self.bundleName):\n\(title)"
-    // @TODO maybe move bundleName(+version) below message
-    alert.informativeText = message
+    alert.messageText = title
+    alert.informativeText = "\(message)\n\n\(footerText)"
     alert.addButton(withTitle: okButtonTitle ?? "OK")
     if let cancelButtonTitle {
       alert.addButton(withTitle: cancelButtonTitle)
