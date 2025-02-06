@@ -39,7 +39,7 @@ public final actor AARMain: GlobalActor, AARLoggable {
     while !Task.isCancelled {
       switch await AARSecurityManager().ensureAccessibilityPermission(isRetry) {
         case .success:
-          AARAirPlayRequestsHandler().scanNotificationCenter()
+          AARNotificationsScanner().scanForAirPlayAlerts()
           await sleep(5)
           break
         case .failure(retry: true):

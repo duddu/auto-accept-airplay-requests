@@ -3,17 +3,17 @@ import AppKit.NSRunningApplication
 import AppKit.NSWorkspace
 import ApplicationServices.HIServices
 
-public struct AARAirPlayRequestsHandler: AARLoggable {
+public struct AARNotificationsScanner: AARLoggable {
   private let notificationCenterBundleId = "com.apple.notificationcenterui"
 
-  public func scanForNotifications() {
+  public func scanForAirPlayAlerts() {
     if let notificationCenterWindow = getNotificationCenterFirstWindow() {
       logger.debug("scanning for airplay notifications")
-      findAndActionAirPlayNotification(in: notificationCenterWindow)
+      findAndActionAirPlayAlert(in: notificationCenterWindow)
     }
   }
 
-  private func findAndActionAirPlayNotification(in element: AXUIElement) {
+  private func findAndActionAirPlayAlert(in element: AXUIElement) {
     for child in getUIElementChildren(of: element) {
       var actionNamesArray: CFArray?
       AXUIElementCopyActionNames(child, &actionNamesArray)
@@ -39,7 +39,7 @@ public struct AARAirPlayRequestsHandler: AARLoggable {
       }
 
       // @TODO avoid recurse here for known scenarios
-      return findAndActionAirPlayNotification(in: child)
+      return findAndActionAirPlayAlert(in: child)
     }
   }
 
