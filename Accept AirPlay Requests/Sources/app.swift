@@ -2,7 +2,7 @@ import AppKit.NSApplication
 import AppKit.NSWorkspace
 import Foundation.NSBundle
 import Foundation.NSProcessInfo
-
+import ServiceManagement.SMAppService
 
 @globalActor
 public final actor AARMain: GlobalActor, AARLoggable {
@@ -129,10 +129,17 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
 
   func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
     logger.debug("handle reopen")
-    // @TODO present user with info/options while process is already running
-    // (same to show when app is launched first time without launch agent registered)
-    if !hasVisibleWindows {
-      AARAlert.info(title: "", message: "This app is already running in the background")
+
+    if
+      NSApplication.shared.modalWindow == nil,
+      AARAlert.info(
+        title: "App already running in the background",
+        message: "To manage the background process go to System Settings > General > Login Items.",
+        okButtonTitle: "Got it",
+        cancelButtonTitle: "Open Login Items Settings"
+      ) == .cancel
+    {
+      SMAppService.openSystemSettingsLoginItems()
     }
 
     return false
