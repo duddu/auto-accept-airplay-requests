@@ -14,21 +14,21 @@ public struct AARSecurityManager: AARLoggable {
       return .success
     }
 
-    if await promptAccessibilityWarning(isRetry) != .OK {
-      logger.error("accessibility permission prompt dismissed")
+    if await promptAccessibilityWarning() != .OK {
+      logger.warning("accessibility permission prompt dismissed")
       return .failure(retry: false)
     }
 
-    if !isRetry,
+    if
       let privacyAccessibilityPanelUrl = URL(
         string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
       )
     {
-      logger.info("opening accessibility system settings")
+      logger.debug("opening accessibility permissions settings")
       NSWorkspace.shared.open(privacyAccessibilityPanelUrl)
     }
 
-    logger.error("accessibility permission not granted")
+    logger.warning("accessibility permission not granted")
     return .failure(retry: true)
   }
 

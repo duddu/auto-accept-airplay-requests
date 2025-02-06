@@ -22,7 +22,8 @@ public final actor AARMain: GlobalActor, AARLoggable {
     await withTaskCancellationHandler {
       task?.cancel()
     } onCancel: {
-      logger.info("task cancelled")
+      logger.debug("task cancelled")
+
       Task { @AARMain in
         await NSApplication.shared.terminate(self)
       }
@@ -61,7 +62,7 @@ public final actor AARMain: GlobalActor, AARLoggable {
 
 @main
 private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
-  private static func main() {
+  static private func main() {
     let appDelegate: Self = .init()
     NSApplication.shared.delegate = appDelegate
     NSApplication.shared.setActivationPolicy(.accessory)
@@ -70,6 +71,7 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
 
   func applicationDidFinishLaunching(_: Notification) {
     logger.debug("did finish launching")
+
     Task { @AARMain in
       await AARMain.shared.start()
     }
@@ -105,6 +107,7 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
     if !hasVisibleWindows {
       AARAlert.info(title: "", message: "This app is already running in the background")
     }
+
     return false
   }
 
