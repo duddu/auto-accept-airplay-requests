@@ -397,7 +397,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "${PRODUCT_NAME}";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024 Davide Doronzo";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Davide Doronzo";
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -489,7 +489,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "${PRODUCT_NAME}";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024 Davide Doronzo";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Davide Doronzo";
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
