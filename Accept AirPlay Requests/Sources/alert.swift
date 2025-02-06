@@ -29,75 +29,21 @@ public struct AARAlert {
     return alert.runModal() == .alertFirstButtonReturn ? .OK : .cancel
   }
 
-  static private func display(
+  static public func display(
     style: NSAlert.Style,
     title: String,
     message: String,
     okButtonTitle: String? = nil,
     cancelButtonTitle: String? = nil
   ) -> NSApplication.ModalResponse {
-    Self.init(
-      style: style,
-      title: title,
-      message: message,
-      okButtonTitle: okButtonTitle ?? nil,
-      cancelButtonTitle: cancelButtonTitle
-    ).run()
-  }
-
-  static private func display(
-    style: NSAlert.Style,
-    title: String,
-    message: String,
-    okButtonTitle: String? = nil
-  ) {
-    _ = Self.init(
-      style: style,
-      title: title,
-      message: message,
-      okButtonTitle: okButtonTitle,
-      cancelButtonTitle: nil
-    ).run()
-  }
-
-  static public func info(
-    title: String,
-    message: String,
-    okButtonTitle: String? = nil
-  ) {
-    Self.display(
-      style: .informational,
-      title: title,
-      message: message,
-      okButtonTitle: okButtonTitle
-    )
-  }
-
-  static public func warning(
-    title: String,
-    message: String,
-    okButtonTitle: String? = nil,
-    cancelButtonTitle: String? = nil
-  ) -> NSApplication.ModalResponse {
-    Self.display(
-      style: .warning,
-      title: title,
-      message: message,
-      okButtonTitle: okButtonTitle,
-      cancelButtonTitle: cancelButtonTitle
-    )
-  }
-
-  static public func error(
-    title: String,
-    message: String,
-    okButtonTitle: String? = nil
-  ) {
-    Self.display(
-      style: .critical,
-      title: title,
-      message: message,
-      okButtonTitle: okButtonTitle
-    )
+    Self
+      .init(
+        style: style,
+        title: title,
+        message: message,
+        okButtonTitle: okButtonTitle,
+        cancelButtonTitle: cancelButtonTitle
+      )
+      .run()
   }
 }

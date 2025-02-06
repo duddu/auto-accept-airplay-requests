@@ -67,7 +67,8 @@ public struct AARServiceManager: AARLoggable {
       details += "; Internal Error = \"\(cause.localizedDescription)\""
     }
 
-    let response: NSApplication.ModalResponse = await AARAlert.error(
+    let response: NSApplication.ModalResponse = await AARAlert.display(
+      style: .critical,
       title: error,
       message: "\(message)\n[ \(details) ]",
       okButtonTitle: "Open Login Items Settings",

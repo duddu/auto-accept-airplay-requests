@@ -132,7 +132,8 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
 
     if
       NSApplication.shared.modalWindow == nil,
-      AARAlert.info(
+      AARAlert.display(
+        style: .informational,
         title: "App already running in the background",
         message: "To manage the background process go to System Settings > General > Login Items.",
         okButtonTitle: "Got it",

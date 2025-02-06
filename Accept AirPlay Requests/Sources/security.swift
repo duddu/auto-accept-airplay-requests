@@ -33,7 +33,8 @@ public struct AARSecurityManager: AARLoggable {
   }
 
   private func promptAccessibilityWarning() async -> NSApplication.ModalResponse {
-    return await AARAlert.warning(
+    return await AARAlert.display(
+      style: .warning,
       title: "Accessibility permission required",
       message: "This app needs your permission to accept the incoming AirPlay requests notifications.\nPlease go to System Settings > Privacy & Security > Accessibility to authorize it.",
       okButtonTitle: "Open Accessibility Settings",
