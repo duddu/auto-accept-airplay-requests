@@ -1,5 +1,7 @@
 import AppKit.NSApplication
+import AppKit.NSWorkspace
 import Foundation.NSBundle
+import Foundation.NSProcessInfo
 
 
 @globalActor
@@ -69,6 +71,29 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
     NSApplication.shared.delegate = appDelegate
     NSApplication.shared.setActivationPolicy(.accessory)
     NSApplication.shared.run()
+  }
+
+  func applicationWillFinishLaunching(_: Notification) {
+    let currentInstancePid = ProcessInfo.processInfo.processIdentifier
+    let multipleInstances = NSWorkspace.shared.runningApplications.filter { instance in
+      instance.bundleIdentifier == AARBundle.identifier &&
+      instance.processIdentifier != currentInstancePid
+      }
+
+    for instance in multipleInstances {
+      let pid = instance.processIdentifier
+      logger.warning("terminating multiple instance with pid=\(pid, privacy: .public)")
+      guard instance.terminate() else {
+        logger.warning(
+          "failed to terminate instance with pid=\(pid, privacy: .public), forcing termination"
+        )
+        guard instance.forceTerminate() else {
+          logger.error("failed to force terminate instance with pid=\(pid, privacy: .public)")
+          continue
+        }
+        continue
+        }
+      }
   }
 
   func applicationDidFinishLaunching(_: Notification) {
