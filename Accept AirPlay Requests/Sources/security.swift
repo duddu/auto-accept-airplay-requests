@@ -32,18 +32,11 @@ public struct AARSecurityManager: AARLoggable {
     return .failure(retry: true)
   }
 
-  private func promptAccessibilityWarning(_ isRetry: Bool) async -> NSApplication.ModalResponse {
-    var message =
-      "This app needs permission to interact with the incoming AirPlay requests notifications. "
-    message +=
-      !isRetry
-      ? "Click the button below to open the Accessibility settings and authorize the app."
-      : "Please open System Settings > Privacy & Security > Accessibility and authorize the app. Then click the button below to let the app check again and validate."
-
+  private func promptAccessibilityWarning() async -> NSApplication.ModalResponse {
     return await AARAlert.warning(
       title: "Accessibility permission required",
-      message: message,
-      okButtonTitle: !isRetry ? "Open System Settings" : "Check again now",
+      message: "This app needs your permission to accept the incoming AirPlay requests notifications.\nPlease go to System Settings > Privacy & Security > Accessibility to authorize it.",
+      okButtonTitle: "Open Accessibility Settings",
       cancelButtonTitle: "Quit"
     )
   }
