@@ -1,4 +1,6 @@
 import AppKit.NSApplication
+import Foundation.NSBundle
+
 
 @globalActor
 public final actor AARMain: GlobalActor, AARLoggable {
@@ -110,10 +112,15 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
 
     return false
   }
+}
 
-  // @TODO
-  // func application(_: NSApplication, willPresentError error: any Error) -> any Error {
-  //   logger.error("internal error: \(error, privacy: .public)")
-  //   return error
-  // }
+public struct AARBundle {
+  static public let identifier: String = Bundle.main.bundleIdentifier!
+  static public let name: String = getInfoDictionaryString(for: kCFBundleNameKey as String)
+  static public let version: String = getInfoDictionaryString(for: "CFBundleShortVersionString")
+  static public let buildNumber: String = getInfoDictionaryString(for: kCFBundleVersionKey as String)
+
+  static private func getInfoDictionaryString(for key: String) -> String {
+    Bundle.main.object(forInfoDictionaryKey: key) as! String
+  }
 }
