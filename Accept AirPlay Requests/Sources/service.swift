@@ -1,3 +1,4 @@
+import AppKit.NSApplication
 import ServiceManagement.SMAppService
 
 public struct AARServiceManager: AARLoggable {
@@ -16,33 +17,31 @@ public struct AARServiceManager: AARLoggable {
         return .success
 
       case .requiresApproval:
-        await handleBackgroundItem()
+        await handleBackgroundItemDisabled()
         return .failure
 
       default:
-        await handleRegistration()
+        await handleAgentRegistration()
         return .failure
     }
   }
 
-  private func handleBackgroundItem() async {
+  private func handleBackgroundItemDisabled() async {
     logger.error("background item disabled")
 
     await displayAgentError(
-      error: "Background item not allowed",
+      error: "Background process not allowed",
       message:
-        "This app needs to run in the background in order to accept incoming AirPlay requests on this computer.\nPlease enable this app's background item in System Settings > General > Login Items."
+        "This app needs to run in the background in order to accept incoming AirPlay notifications on this computer.\nPlease go to System Settings > General > Login Items to allow it."
     )
-
-    SMAppService.openSystemSettingsLoginItems()
   }
 
-  private func handleRegistration() async {
+  private func handleAgentRegistration() async {
     logger.debug("try registration")
 
     do {
-      // @TODO try? await agent.unregister() first if status != .notRegistered
-      // @TODO provide a way to easily unregister (e.g. an alert button if status = .requiresApproval)
+      // @TODO if status != .notRegistered try? await agent.unregister() first
+      // @TODO if status = .requiresApproval provide a button way to unregister
       try agent.register()
 
       logger.info("registration succeeded")
@@ -50,9 +49,9 @@ public struct AARServiceManager: AARLoggable {
       logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
 
       await displayAgentError(
-        error: "Service registration failed",
+        error: "Launch Agent registration failed",
         message:
-          "Unable to register the launch agent for managing this app in the background. Please check if it’s already registered or try again after restarting your computer.",
+          "This app was unable to register the service to manage the background process.\nPlease check in System Settings > General > Login Items if it's already been registered, or try again after a system reboot.",
         cause: error
       )
     }
@@ -63,13 +62,20 @@ public struct AARServiceManager: AARLoggable {
     message: String,
     cause: (any Error)? = nil
   ) async {
-    var details: [String] = []
-    if let cause { details.append("Internal Error: \"\(cause.localizedDescription)\"") }
-    details.append("Service Status: \(agent.status.rawValue)")
+    var details = "Service Status = \(agent.status.rawValue)"
+    if let cause {
+      details += "; Internal Error = \"\(cause.localizedDescription)\""
+    }
 
-    await AARAlert.error(
-      title: "Error: \(error)",
-      message: "\(message)\n\n( \(details.joined(separator: ", ")) )"
+    let response: NSApplication.ModalResponse = await AARAlert.error(
+      title: error,
+      message: "\(message)\n[ \(details) ]",
+      okButtonTitle: "Open Login Items Settings",
+      cancelButtonTitle: "Quit"
     )
+
+    if response == .OK {
+      SMAppService.openSystemSettingsLoginItems()
+    }
   }
 }
