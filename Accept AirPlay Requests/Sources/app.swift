@@ -4,8 +4,112 @@ import Foundation.NSBundle
 import Foundation.NSProcessInfo
 import ServiceManagement.SMAppService
 
+@main
+private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
+  static private func main() {
+    let appDelegate: Self = .init()
+    NSApplication.shared.delegate = appDelegate
+    NSApplication.shared.setActivationPolicy(.accessory)
+    NSApplication.shared.run()
+  }
+
+  func applicationWillFinishLaunching(_: Notification) {
+    let currentInstancePid = ProcessInfo.processInfo.processIdentifier
+    let multipleInstances = NSWorkspace.shared.runningApplications.filter { instance in
+      instance.bundleIdentifier == AARBundle.identifier &&
+      instance.processIdentifier != currentInstancePid
+    }
+
+    for instance in multipleInstances {
+      let pid = instance.processIdentifier
+      logger.warning("terminating multiple instance with pid=\(pid, privacy: .public)")
+      guard instance.terminate() else {
+        logger.warning(
+          "failed to terminate instance with pid=\(pid, privacy: .public), forcing termination"
+        )
+        guard instance.forceTerminate() else {
+          logger.error("failed to force terminate instance with pid=\(pid, privacy: .public)")
+          continue
+        }
+        continue
+      }
+    }
+  }
+
+  func applicationDidFinishLaunching(_: Notification) {
+    logger.debug("did finish launching")
+
+    Task { @AARMain in
+      await AARMain.shared.start()
+    }
+  }
+
+  func applicationWillTerminate(_: Notification) {
+    logger.debug("will terminate")
+  }
+
+  func applicationDidUpdate(_: Notification) {
+    guard let modal = NSApplication.shared.modalWindow else {
+      if NSApplication.shared.activationPolicy() == .regular {
+        logger.debug("did update - deactivate")
+
+        NSApplication.shared.deactivate()
+        NSApplication.shared.setActivationPolicy(.accessory)
+      }
+
+      return
+    }
+
+    if NSApplication.shared.activationPolicy() == .accessory {
+      logger.debug("did update - activate")
+
+      NSApplication.shared.setActivationPolicy(.regular)
+      NSApplication.shared.activate(ignoringOtherApps: true)
+      modal.makeKeyAndOrderFront(nil)
+      modal.collectionBehavior = .moveToActiveSpace
+    }
+  }
+
+  func applicationDidResignActive(_ n: Notification) {
+    logger.debug("did resign active")
+
+    guard let modal = NSApplication.shared.modalWindow else { return }
+
+    modal.center()
+
+    if
+      !NSApplication.shared.isActive,
+      NSApplication.shared.activationPolicy() == .regular,
+      !NSApplication.shared.isHidden
+    {
+      logger.debug("did resign active - activate")
+
+      NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+  }
+
+  func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
+    logger.debug("handle reopen")
+
+    if
+      NSApplication.shared.modalWindow == nil,
+      AARAlert.display(
+        style: .informational,
+        title: "App already running in the background",
+        message: "To manage the background process go to System Settings > General > Login Items.",
+        okButtonTitle: "Got it",
+        cancelButtonTitle: "Open Login Items Settings"
+      ) == .cancel
+    {
+      SMAppService.openSystemSettingsLoginItems()
+    }
+
+    return false
+  }
+}
+
 @globalActor
-public final actor AARMain: GlobalActor, AARLoggable {
+private final actor AARMain: GlobalActor, AARLoggable {
   static public let shared = AARMain()
 
   private init() {}
@@ -61,89 +165,6 @@ public final actor AARMain: GlobalActor, AARLoggable {
       for: .seconds(seconds),
       tolerance: .seconds(seconds / 5)
     )
-  }
-}
-
-@main
-private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
-  static private func main() {
-    let appDelegate: Self = .init()
-    NSApplication.shared.delegate = appDelegate
-    NSApplication.shared.setActivationPolicy(.accessory)
-    NSApplication.shared.run()
-  }
-
-  func applicationWillFinishLaunching(_: Notification) {
-    let currentInstancePid = ProcessInfo.processInfo.processIdentifier
-    let multipleInstances = NSWorkspace.shared.runningApplications.filter { instance in
-      instance.bundleIdentifier == AARBundle.identifier &&
-      instance.processIdentifier != currentInstancePid
-      }
-
-    for instance in multipleInstances {
-      let pid = instance.processIdentifier
-      logger.warning("terminating multiple instance with pid=\(pid, privacy: .public)")
-      guard instance.terminate() else {
-        logger.warning(
-          "failed to terminate instance with pid=\(pid, privacy: .public), forcing termination"
-        )
-        guard instance.forceTerminate() else {
-          logger.error("failed to force terminate instance with pid=\(pid, privacy: .public)")
-          continue
-        }
-        continue
-        }
-      }
-  }
-
-  func applicationDidFinishLaunching(_: Notification) {
-    logger.debug("did finish launching")
-
-    Task { @AARMain in
-      await AARMain.shared.start()
-    }
-  }
-
-  func applicationWillTerminate(_: Notification) {
-    logger.debug("will terminate")
-  }
-
-  func applicationDidUpdate(_: Notification) {
-    if NSApplication.shared.windows.count > 0 {
-      NSApplication.shared.setActivationPolicy(.regular)
-      NSApplication.shared.activate(ignoringOtherApps: true)
-      NSApplication.shared.modalWindow?.makeKeyAndOrderFront(nil)
-      NSApplication.shared.modalWindow?.collectionBehavior = .moveToActiveSpace
-    } else {
-      NSApplication.shared.deactivate()
-      NSApplication.shared.setActivationPolicy(.accessory)
-    }
-  }
-
-  func applicationDidResignActive(_: Notification) {
-    logger.debug("reactivate after resign")
-    if NSApplication.shared.windows.count > 0 {
-      NSApplication.shared.activate(ignoringOtherApps: true)
-    }
-  }
-
-  func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
-    logger.debug("handle reopen")
-
-    if
-      NSApplication.shared.modalWindow == nil,
-      AARAlert.display(
-        style: .informational,
-        title: "App already running in the background",
-        message: "To manage the background process go to System Settings > General > Login Items.",
-        okButtonTitle: "Got it",
-        cancelButtonTitle: "Open Login Items Settings"
-      ) == .cancel
-    {
-      SMAppService.openSystemSettingsLoginItems()
-    }
-
-    return false
   }
 }
 
