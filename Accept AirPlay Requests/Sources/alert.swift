@@ -1,10 +1,11 @@
 import AppKit.NSAlert
 import AppKit.NSApplication
-import Foundation.NSBundle
+import AppKit.NSWorkspace
 
 @MainActor
 public struct AARAlert {
   private let alert: NSAlert
+  private lazy var delegate = AARAlertDelegate()
   private let footerText = "\(AARBundle.name)\nv\(AARBundle.version) (\(AARBundle.buildNumber))"
 
   private init(
@@ -22,10 +23,11 @@ public struct AARAlert {
     if let cancelButtonTitle {
       alert.addButton(withTitle: cancelButtonTitle)
     }
+    alert.showsHelp = true
+    alert.delegate = delegate
   }
 
   private func run() -> NSApplication.ModalResponse {
-    NSApplication.shared.setActivationPolicy(.regular)
     return alert.runModal() == .alertFirstButtonReturn ? .OK : .cancel
   }
 
@@ -45,5 +47,22 @@ public struct AARAlert {
         cancelButtonTitle: cancelButtonTitle
       )
       .run()
+  }
+}
+
+private final class AARAlertDelegate: NSObject, NSAlertDelegate, AARLoggable {
+  private let readmeUrlStr = "https://github.com/duddu/auto-accept-airplay-requests#readme"
+
+  public func alertShowHelp(_: NSAlert) -> Bool {
+    logger.debug("alert show help")
+
+    if let readmeUrl = URL(string: readmeUrlStr) {
+      logger.debug("opening readme url")
+
+      NSApplication.shared.hide(self)
+      NSWorkspace.shared.open(readmeUrl)
+    }
+
+    return true
   }
 }
