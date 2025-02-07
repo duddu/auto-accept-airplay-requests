@@ -76,16 +76,6 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
     guard let modal = NSApplication.shared.modalWindow else { return }
 
     modal.center()
-
-    if
-      !NSApplication.shared.isActive,
-      NSApplication.shared.activationPolicy() == .regular,
-      !NSApplication.shared.isHidden
-    {
-      logger.debug("did resign active - activate")
-
-      NSApplication.shared.activate(ignoringOtherApps: true)
-    }
   }
 
   func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {

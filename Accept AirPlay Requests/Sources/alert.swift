@@ -59,7 +59,6 @@ private final class AARAlertDelegate: NSObject, NSAlertDelegate, AARLoggable {
     if let readmeUrl = URL(string: readmeUrlStr) {
       logger.debug("opening readme url")
 
-      NSApplication.shared.hide(self)
       NSWorkspace.shared.open(readmeUrl)
     }
 
