@@ -1,18 +1,22 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: './Docs'
+    directory: '/Docs'
     versioning-strategy: increase
+    commit-message:
+      prefix: 'docs(npm)'
+    schedule:
+      interval: weekly
     groups:
-      npm dev dependencies:
+      dev:
         dependency-type: development
         applies-to: version-updates
         update-types:
           - minor
           - patch
-    schedule:
-      interval: weekly
   - package-ecosystem: github-actions
     directory: '/'
+    commit-message:
+      prefix: 'ci'
     schedule:
       interval: weekly
