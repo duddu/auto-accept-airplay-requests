@@ -8,6 +8,13 @@ on:
     branches:
       - latest
 
+permissions:
+  contents: read
+  packages: read
+  actions: read
+  checks: write
+  security-events: write
+  
 defaults:
   run:
     shell: bash
@@ -15,42 +22,36 @@ defaults:
 jobs:
   codeql:
     name: CodeQL (${{ matrix.language }})
-    runs-on: ${{ (matrix.language == 'Swift' && 'macos-15') || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - language: Swift
-            build-mode: manual
+            build-mode: autobuild
+            source-root: 'Accept AirPlay Requests'
+            runner: macos-15
           - language: TypeScript
             build-mode: none
-          - language: Actions
-            build-mode: none
+            source-root: 'Docs/.vuepress'
+            runner: ubuntu-latest
     concurrency:
-      group: CodeQL-${{ matrix.language }}
+      group: ${{ github.workflow_ref }}--${{  matrix.language }}
       cancel-in-progress: true
     timeout-minutes: 30
-    permissions:
-      security-events: write
-      packages: read
-      actions: read
-      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: CodeQL Initialize
+        uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          trap-caching: true
+          source-root: ${{ matrix.source-root }}
+          queries: security-and-quality
           dependency-caching: true
-          config: |
-            queries:
-              - uses: security-and-quality
-            paths:
-              - '**/*'
-      - if: matrix.language == 'Swift'
-        name: Build Swift Package
-        run: swift build --package-path 'Accept AirPlay Requests'
-      - uses: github/codeql-action/analyze@v3
+          trap-caching: true
+      - name: CodeQL Analyze
+        uses: github/codeql-action/analyze@v3
         with:
-          category: '/lang:${{ matrix.language }}'
+          category: ${{ matrix.language }}
