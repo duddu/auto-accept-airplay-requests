@@ -159,12 +159,12 @@ private final actor AARMain: GlobalActor, AARLoggable {
 }
 
 public struct AARBundle {
-  static public let identifier: String = Bundle.main.bundleIdentifier!
+  static public let identifier: String = getInfoDictionaryString(for: kCFBundleIdentifierKey as String)
   static public let name: String = getInfoDictionaryString(for: kCFBundleNameKey as String)
   static public let version: String = getInfoDictionaryString(for: "CFBundleShortVersionString")
   static public let buildNumber: String = getInfoDictionaryString(for: kCFBundleVersionKey as String)
 
   static private func getInfoDictionaryString(for key: String) -> String {
-    Bundle.main.object(forInfoDictionaryKey: key) as! String
+    Bundle.main.object(forInfoDictionaryKey: key) as? String ?? "unknown"
   }
 }
