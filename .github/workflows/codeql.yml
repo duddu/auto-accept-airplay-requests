@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
   actions: read
   checks: write
   security-events: write
@@ -22,7 +21,7 @@ defaults:
 jobs:
   codeql:
     name: CodeQL (${{ matrix.language }})
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -32,9 +31,8 @@ jobs:
             source-root: 'Accept AirPlay Requests'
             runner: macos-15
           - language: TypeScript
-            build-mode: none
             source-root: 'Docs/.vuepress'
-            runner: ubuntu-latest
+          - language: Actions
     concurrency:
       group: ${{ github.workflow_ref }}--${{  matrix.language }}
       cancel-in-progress: true
@@ -46,7 +44,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
+          build-mode: ${{ matrix.build-mode || 'none' }}
           source-root: ${{ matrix.source-root }}
           queries: security-and-quality
           dependency-caching: true
