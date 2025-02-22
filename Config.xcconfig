@@ -1,2 +1,9 @@
 AAR_VERSION = 1.1.1
 AAR_BUILD_NUMBER = 2502170313
+AAR_BUNDLE_NAME = Accept AirPlay Requests
+AAR_BUNDLE_ID = dev.duddu.AcceptAirPlayRequests
+AAR_AUTHOR_NAME = duddu
+AAR_REPO_DOCS_DIR = Docs
+AAR_DOCS_TITLE = (Auto) Accept AirPlay Requests
+AAR_DOCS_HOSTNAME = auto-accept-airplay-requests.duddu.dev
+AAR_REPO_HOSTNAME = github.com/duddu/auto-accept-airplay-requests
