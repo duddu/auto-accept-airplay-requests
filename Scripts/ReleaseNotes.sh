@@ -6,7 +6,7 @@ set -u
 : "${ASSET_BASE_NAME}"
 : "${BUILD_NUMBER}"
 : "${EXPORT_PATH}"
-: "${PRODUCT_NAME}"
+: "${BUNDLE_NAME}"
 : "${TAG_NAME}"
 : "${VERSION}"
 
@@ -22,7 +22,7 @@ else
   CHANGELOG_PATH="commits/$TAG_NAME"
 fi
 
-BUNDLE_PATH="$EXPORT_PATH/$PRODUCT_NAME.app"
+BUNDLE_PATH="$EXPORT_PATH/$BUNDLE_NAME.app"
 if (! codesign -v -r- "$BUNDLE_PATH"); then
   >&2 echo '❌ Cannot verify code signature'; exit 1
 fi
@@ -30,7 +30,7 @@ CODESIGN_ALL="$(codesign -d -vv "$BUNDLE_PATH" 2>&1)"
 CODESIGN_ARM="$(codesign -a arm64 -d -vvv "$BUNDLE_PATH" 2>&1)"
 CODESIGN_X86="$(codesign -a x86_64 -d -vvv "$BUNDLE_PATH" 2>&1)"
 
-echo "### :package: [$PRODUCT_NAME.app (zip)]($REPO_BASE_URL/releases/download/$TAG_NAME/$ASSET_BASE_NAME.zip)
+echo "### :package: [$BUNDLE_NAME.app (zip)]($REPO_BASE_URL/releases/download/$TAG_NAME/$ASSET_BASE_NAME.zip)
 
 | Version | Build | Format | Architecture |
 | :--- | :--- | :--- | :--- |
@@ -51,7 +51,7 @@ echo "### :package: [$PRODUCT_NAME.app (zip)]($REPO_BASE_URL/releases/download/$
 
 To verify the signature locally run this command and compare the outputs:
 \`\`\`sh
-codesign -d -r- -vvv '<PATH_TO_APP>/$PRODUCT_NAME.app'
+codesign -d -r- -vvv '<PATH_TO_APP>/$BUNDLE_NAME.app'
 \`\`\`
 </details>
 

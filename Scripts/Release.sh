@@ -12,7 +12,6 @@ set -u
 
 export VERSION
 export TAG_NAME="v$VERSION"
-export PRODUCT_NAME='Accept AirPlay Requests'
 SCRIPTS_DIR="$(realpath "${0%/*}")"
 PROJECT_ROOT="$(realpath "$SCRIPTS_DIR/..")"
 
@@ -30,7 +29,11 @@ fi
 git checkout latest -q
 git pull -q
 
-read -s -rp "🔔 Release $PRODUCT_NAME v$VERSION? (y/N) "$'\n' -n1 CONFIRM
+XCCONFIG_PATH="$PROJECT_ROOT/Config.xcconfig"
+BUNDLE_NAME="$(sed -n 's/^AAR_BUNDLE_NAME[ ]*=[ ]*//p' "$XCCONFIG_PATH")"
+export BUNDLE_NAME
+
+read -s -rp "🔔 Release $BUNDLE_NAME v$VERSION? (y/N) "$'\n' -n1 CONFIRM
 if [[ "$CONFIRM" != "y" ]]; then
   echo "🚫 Release aborted"; exit 0
 fi
@@ -45,20 +48,20 @@ bash "$SCRIPTS_DIR/UpdateConfig.sh" \
   AAR_BUILD_NUMBER="$BUILD_NUMBER"
 
 ARCHIVE_DIR="$HOME/Library/Developer/Xcode/Archives/$(build_date '+%Y-%m-%d')"
-ARCHIVE_PATH="$ARCHIVE_DIR/$PRODUCT_NAME $(build_date '+%d-%m-%Y, %H:%M:%S').xcarchive"
+ARCHIVE_PATH="$ARCHIVE_DIR/$BUNDLE_NAME $(build_date '+%d-%m-%Y, %H:%M:%S').xcarchive"
 DESTINATION='generic/platform=macOS,name=Any Mac'
 
 echo "📦 Producing app archive at $ARCHIVE_PATH"
 
 xcodebuild clean -quiet
 xcodebuild archive -quiet \
-  -scheme "$PRODUCT_NAME" -alltargets \
+  -scheme "$BUNDLE_NAME" -alltargets \
   -destination "$DESTINATION" \
   -archivePath "$ARCHIVE_PATH"
 
-export EXPORT_PATH="${TMPDIR%/}/${PRODUCT_NAME}_v${VERSION}_${BUILD_NUMBER}"
+export EXPORT_PATH="${TMPDIR%/}/${BUNDLE_NAME}_v${VERSION}_${BUILD_NUMBER}"
 
-echo "💾 Exporting app copy at $EXPORT_PATH/$PRODUCT_NAME.app"
+echo "💾 Exporting app copy at $EXPORT_PATH/$BUNDLE_NAME.app"
 
 xcodebuild -exportArchive -quiet \
   -archivePath "$ARCHIVE_PATH" \
@@ -67,18 +70,18 @@ xcodebuild -exportArchive -quiet \
 
 echo "🚀 Creating GitHub release $TAG_NAME"
 
-export ASSET_BASE_NAME="${PRODUCT_NAME// /_}_${TAG_NAME}_${BUILD_NUMBER}.app"
+export ASSET_BASE_NAME="${BUNDLE_NAME// /_}_${TAG_NAME}_${BUILD_NUMBER}.app"
 RELEASE_NOTES="$(bash "$SCRIPTS_DIR/ReleaseNotes.sh")"
 
-tar -jcf "$EXPORT_PATH/$ASSET_BASE_NAME.zip" -C"$EXPORT_PATH" "$PRODUCT_NAME.app"
-tar -zcf "$EXPORT_PATH/$ASSET_BASE_NAME.tar.gz" -C"$EXPORT_PATH" "$PRODUCT_NAME.app"
-git add "$PROJECT_ROOT/Config.xcconfig"
+tar -jcf "$EXPORT_PATH/$ASSET_BASE_NAME.zip" -C"$EXPORT_PATH" "$BUNDLE_NAME.app"
+tar -zcf "$EXPORT_PATH/$ASSET_BASE_NAME.tar.gz" -C"$EXPORT_PATH" "$BUNDLE_NAME.app"
+git add "$XCCONFIG_PATH"
 git commit -S -m "chore: bump version to $VERSION"
 git push -q
 gh release create "$TAG_NAME" -t "$TAG_NAME" \
   --notes "$RELEASE_NOTES" \
-  "$EXPORT_PATH/$ASSET_BASE_NAME.zip#$PRODUCT_NAME.app (zip)" \
-  "$EXPORT_PATH/$ASSET_BASE_NAME.tar.gz#$PRODUCT_NAME.app (tar.gz)"
+  "$EXPORT_PATH/$ASSET_BASE_NAME.zip#$BUNDLE_NAME.app (zip)" \
+  "$EXPORT_PATH/$ASSET_BASE_NAME.tar.gz#$BUNDLE_NAME.app (tar.gz)"
 git fetch origin --tags
 
 echo "✅ Version $VERSION ($BUILD_NUMBER) archived and released"
