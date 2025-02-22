@@ -24,8 +24,8 @@ defaults:
 jobs:
   build:
     name: VuePress Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: macos-latest
+    timeout-minutes: 10
     env:
       DOCS_DIR: ${{ github.workspace }}/Docs
     steps:

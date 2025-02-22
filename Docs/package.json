@@ -1,43 +1,32 @@
 {
   "private": true,
-  "version": "0.0.0",
-  "name": "auto-accept-airplay-requests-docs",
-  "homepage": "https://auto-accept-airplay-requests.duddu.dev",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/duddu/auto-accept-airplay-requests",
-    "directory": "Docs"
-  },
-  "author": {
-    "name": "duddu",
-    "url": "https://github.com/duddu"
-  },
-  "config": {
-    "appName": "Accept AirPlay Requests",
-    "appTitle": "(Auto) Accept AirPlay Requests"
-  },
+  "version": "0.0.0-docs",
+  "name": "auto-accept-airplay-requests-documentation",
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
-    "vuepress": "node --env-file-if-exists=../Config.xcconfig ./node_modules/.bin/vuepress",
-    "dev": "npm run vuepress dev",
+    "dev": "vuepress dev",
     "dev:clean": "npm run dev -- --clean-cache",
-    "build": "npm run vuepress build --clean-cache",
+    "build": "vuepress build --clean-cache",
     "serve": "npm run build && npx http-server .vuepress/dist",
     "update-deps": "npx vp-update"
   },
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.36.0"
+  },
   "devDependencies": {
-    "@vuepress/bundler-webpack": "2.0.0-rc.19",
-    "@vuepress/plugin-markdown-hint": "2.0.0-rc.77",
-    "@vuepress/plugin-markdown-include": "2.0.0-rc.77",
-    "@vuepress/theme-default": "2.0.0-rc.77",
+    "@vuepress/bundler-webpack": "2.0.0-rc.20",
+    "@vuepress/plugin-markdown-hint": "2.0.0-rc.78",
+    "@vuepress/plugin-markdown-include": "2.0.0-rc.78",
+    "@vuepress/theme-default": "2.0.0-rc.78",
     "esbuild": ">=0.25.0",
     "sass-embedded": "^1.85.0",
     "sass-loader": "^16.0.5",
     "vue": "^3.5.13",
-    "vuepress": "2.0.0-rc.19"
+    "vuepress": "2.0.0-rc.20"
   },
   "overrides": {
-    "esbuild": "$esbuild"
+    "esbuild": "$esbuild",
+    "vuepress": "$vuepress"
   }
 }
