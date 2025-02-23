@@ -11,8 +11,8 @@
   "defaultOptions" : {
     "codeCoverage" : false,
     "targetForVariableExpansion" : {
-      "containerPath" : "container:Accept AirPlay Requests",
-      "identifier" : "Accept AirPlay Requests",
+      "containerPath" : "container:Accept AirPlay Requests.xcodeproj",
+      "identifier" : "4D9EC9602C9B5D7C00D8B522",
       "name" : "Accept AirPlay Requests"
     }
   },

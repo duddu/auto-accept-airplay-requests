@@ -4,6 +4,13 @@
 <dict>
 	<key>CFBundleIconFile</key>
 	<string>BundleIcon</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>AARDocumentationUrl</key>
+		<string>${AAR_DOCS_URL}</string>
+		<key>AARRepositoryUrl</key>
+		<string>${AAR_REPO_URL}</string>
+	</dict>
 	<key>LSMinimumSystemVersion</key>
 	<string>13</string>
 	<key>LSMultipleInstancesProhibited</key>

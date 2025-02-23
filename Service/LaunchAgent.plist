@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>dev.duddu.AcceptAirPlayRequests.LaunchAgent</string>
+	<string>${PRODUCT_BUNDLE_IDENTIFIER}.LaunchAgent</string>
 	<key>AssociatedBundleIdentifiers</key>
-	<string>dev.duddu.AcceptAirPlayRequests</string>
+	<string>${PRODUCT_BUNDLE_IDENTIFIER}</string>
 	<key>BundleProgram</key>
-	<string>Contents/MacOS/Accept AirPlay Requests</string>
+	<string>${BUNDLE_EXECUTABLE_FOLDER_PATH}/${EXECUTABLE_NAME}</string>
 	<key>ProcessType</key>
 	<string>Background</string>
 	<key>RunAtLoad</key>

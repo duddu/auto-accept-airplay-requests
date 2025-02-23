@@ -7,20 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D2AB05D2D63EC7800B661E5 /* Accept AirPlay Requests in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D2AB05C2D63EC7800B661E5 /* Accept AirPlay Requests */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D2520BF2D643CC300A24B33 /* Accept AirPlay Requests */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4D54FB262D33847B009C5A1E /* BundleIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FB252D33847B009C5A1E /* BundleIcon.icns */; };
 		4D74AC7C2CA389B70013FA58 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7A2CA389B70013FA58 /* LICENSE */; };
 		4D74AC7D2CA389B70013FA58 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7B2CA389B70013FA58 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4D9EC97E2C9B97BA00D8B522 /* CopyFiles */ = {
+		4D9EC97E2C9B97BA00D8B522 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Contents/Library/LaunchAgents;
 			dstSubfolderSpec = 1;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4D9EC9872C9BAF7300D8B522 /* CopyFiles */ = {
@@ -29,7 +30,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				4D2AB05D2D63EC7800B661E5 /* Accept AirPlay Requests in CopyFiles */,
+				4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -37,7 +38,7 @@
 
 /* Begin PBXFileReference section */
 		4D1E6D942D63F2C500AAC3E9 /* Accept AirPlay Requests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Accept AirPlay Requests.xctestplan"; path = "Accept AirPlay Requests/Accept AirPlay Requests.xctestplan"; sourceTree = "<group>"; };
-		4D2AB05C2D63EC7800B661E5 /* Accept AirPlay Requests */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "Accept AirPlay Requests"; path = "DerivedData/Accept AirPlay Requests/Build/Products/Release/Accept AirPlay Requests"; sourceTree = "<group>"; };
+		4D2520BF2D643CC300A24B33 /* Accept AirPlay Requests */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "Accept AirPlay Requests"; path = "DerivedData/Accept AirPlay Requests/Build/Products/Release/Accept AirPlay Requests"; sourceTree = "<group>"; };
 		4D54FB1C2D33847B009C5A1E /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		4D54FB202D33847B009C5A1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D54FB252D33847B009C5A1E /* BundleIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = BundleIcon.icns; sourceTree = "<group>"; };
@@ -70,7 +71,10 @@
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 		4D9BE75A2D3A6C0300768A12 /* Exceptions for "Service" folder in "Copy Files" phase from "Accept AirPlay Requests" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 4D9EC97E2C9B97BA00D8B522 /* CopyFiles */;
+			attributesByRelativePath = {
+				LaunchAgent.plist = (CodeSignOnCopy, );
+			};
+			buildPhase = 4D9EC97E2C9B97BA00D8B522 /* Copy Files */;
 			membershipExceptions = (
 				LaunchAgent.plist,
 			);
@@ -127,7 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				4D9EC9612C9B5D7C00D8B522 /* Accept AirPlay Requests.app */,
-				4D2AB05C2D63EC7800B661E5 /* Accept AirPlay Requests */,
+				4D2520BF2D643CC300A24B33 /* Accept AirPlay Requests */,
 				4D1E6D942D63F2C500AAC3E9 /* Accept AirPlay Requests.xctestplan */,
 			);
 			name = Products;
@@ -143,8 +147,9 @@
 				4D9EC95D2C9B5D7C00D8B522 /* Sources */,
 				4D9EC95E2C9B5D7C00D8B522 /* Frameworks */,
 				4D9EC95F2C9B5D7C00D8B522 /* Resources */,
-				4D9EC97E2C9B97BA00D8B522 /* CopyFiles */,
 				4D9EC9872C9BAF7300D8B522 /* CopyFiles */,
+				4D9EC97E2C9B97BA00D8B522 /* Copy Files */,
+				4D3191E22D6414D700B1B747 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -212,6 +217,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4D3191E22D6414D700B1B747 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "#!/usr/bin/env bash\n\nset -e\nset -u\n\nBUNDLE_DIR=\"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH\"\nAGENT_PLIST_PATH=\"$BUNDLE_DIR/Library/LaunchAgents/LaunchAgent.plist\"\n\necho \"$(/opt/homebrew/bin/envsubst < \"$AGENT_PLIST_PATH\")\" > \"$AGENT_PLIST_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4D9EC95D2C9B5D7C00D8B522 /* Sources */ = {
@@ -375,10 +402,10 @@
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
 				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "${PRODUCT_NAME}";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(AAR_BUNDLE_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024-present Davide Doronzo";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024-present Davide Doronzo (https://$(AAR_REPO_URL))";
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -388,7 +415,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OSACOMPILE_EXECUTE_ONLY = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.duddu.AcceptAirPlayRequests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(AAR_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
@@ -467,10 +494,10 @@
 				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
 				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "${PRODUCT_NAME}";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(AAR_BUNDLE_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024-present Davide Doronzo";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024-present Davide Doronzo (https://$(AAR_REPO_URL))";
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -479,7 +506,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OSACOMPILE_EXECUTE_ONLY = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.duddu.AcceptAirPlayRequests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(AAR_BUNDLE_ID)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
