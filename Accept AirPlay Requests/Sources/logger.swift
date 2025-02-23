@@ -1,3 +1,5 @@
+import AppKit.NSRunningApplication
+import Foundation.NSProcessInfo
 import os.log
 
 public protocol AARLoggable {
@@ -8,10 +10,10 @@ public protocol AARLoggable {
 extension AARLoggable {
   static public var logger: Logger {
     .init(
-      subsystem: AARBundle.identifier,
-      category: String(String(describing: self).trimmingPrefix(/^AAR/))
+      subsystem: NSRunningApplication.current.bundleIdentifier ?? ProcessInfo.processInfo.processName,
+      category: String(String(describing: self).trimmingPrefix("AAR"))
     )
   }
 
-  public var logger: Logger { Self.logger }
+  public var logger: Logger { Self.logger.self }
 }
