@@ -1,7 +1,6 @@
 import AppKit.NSApplication
+import AppKit.NSRunningApplication
 import AppKit.NSWorkspace
-import Foundation.NSBundle
-import Foundation.NSProcessInfo
 import ServiceManagement.SMAppService
 
 @main
@@ -14,10 +13,10 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
   }
 
   func applicationWillFinishLaunching(_: Notification) {
-    let currentInstancePid = ProcessInfo.processInfo.processIdentifier
+    let currentInstance = NSRunningApplication.current
     let multipleInstances = NSWorkspace.shared.runningApplications.filter { instance in
-      instance.bundleIdentifier == AARBundle.identifier &&
-      instance.processIdentifier != currentInstancePid
+      instance.bundleIdentifier == currentInstance.bundleIdentifier &&
+      instance.processIdentifier != currentInstance.processIdentifier
     }
 
     for instance in multipleInstances {
@@ -155,16 +154,5 @@ private final actor AARMain: GlobalActor, AARLoggable {
       for: .seconds(seconds),
       tolerance: .seconds(seconds / 5)
     )
-  }
-}
-
-public struct AARBundle {
-  static public let identifier: String = getInfoDictionaryString(for: kCFBundleIdentifierKey as String)
-  static public let name: String = getInfoDictionaryString(for: kCFBundleNameKey as String)
-  static public let version: String = getInfoDictionaryString(for: "CFBundleShortVersionString")
-  static public let buildNumber: String = getInfoDictionaryString(for: kCFBundleVersionKey as String)
-
-  static private func getInfoDictionaryString(for key: String) -> String {
-    Bundle.main.object(forInfoDictionaryKey: key) as? String ?? "unknown"
   }
 }
