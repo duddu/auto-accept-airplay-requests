@@ -1,7 +1,6 @@
 import AppKit.NSApplication
 import AppKit.NSRunningApplication
 import AppKit.NSWorkspace
-import ServiceManagement.SMAppService
 
 @main
 private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
@@ -78,19 +77,12 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
   }
 
   func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
-    logger.debug("handle reopen")
+    if !hasVisibleWindows {
+      logger.debug("handle reopen - display agent info")
 
-    if
-      NSApplication.shared.modalWindow == nil,
-      AARAlert.display(
-        style: .informational,
-        title: "App already running in the background",
-        message: "To manage the background process go to System Settings > General > Login Items.",
-        okButtonTitle: "Got it",
-        cancelButtonTitle: "Open Login Items Settings"
-      ) == .cancel
-    {
-      SMAppService.openSystemSettingsLoginItems()
+      Task {
+        await AARServiceManager.displayAgentInfo()
+      }
     }
 
     return false

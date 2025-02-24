@@ -1,4 +1,3 @@
-import AppKit.NSApplication
 import ServiceManagement.SMAppService
 
 public struct AARServiceManager: AARLoggable {
@@ -67,15 +66,25 @@ public struct AARServiceManager: AARLoggable {
       details += "; Internal Error = \"\(cause.localizedDescription)\""
     }
 
-    let response: NSApplication.ModalResponse = await AARAlert.display(
+    if await AARAlert.display(
       style: .critical,
       title: error,
       message: "\(message)\n[ \(details) ]",
       okButtonTitle: "Open Login Items Settings",
       cancelButtonTitle: "Quit"
-    )
+    ) == .OK {
+      SMAppService.openSystemSettingsLoginItems()
+    }
+  }
 
-    if response == .OK {
+  static public func displayAgentInfo() async {
+    if await AARAlert.display(
+      style: .informational,
+      title: "App already running in the background",
+      message: "To manage the background process go to System Settings > General > Login Items.",
+      okButtonTitle: "Got it",
+      cancelButtonTitle: "Open Login Items Settings"
+    ) == .cancel {
       SMAppService.openSystemSettingsLoginItems()
     }
   }
