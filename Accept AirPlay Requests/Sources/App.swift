@@ -1,52 +1,52 @@
 import AppKit.NSApplication
 import AppKit.NSRunningApplication
-import AppKit.NSWorkspace
 
 @main
-private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
+private final class AARApp: NSObject, NSApplicationDelegate, Sendable, AARLoggable {
+  static private let delegate = AARApp()
+
   static private func main() {
-    let appDelegate: Self = .init()
-    NSApplication.shared.delegate = appDelegate
     NSApplication.shared.setActivationPolicy(.accessory)
+    NSApplication.shared.delegate = delegate
     NSApplication.shared.run()
   }
 
-  func applicationWillFinishLaunching(_: Notification) {
-    let currentInstance = NSRunningApplication.current
-    let multipleInstances = NSWorkspace.shared.runningApplications.filter { instance in
-      instance.bundleIdentifier == currentInstance.bundleIdentifier &&
-      instance.processIdentifier != currentInstance.processIdentifier
-    }
+  private func terminateOtherInstances() {
+    guard let bundleId = NSRunningApplication.current.bundleIdentifier else { return }
+    let currentProcessId = NSRunningApplication.current.processIdentifier
 
-    for instance in multipleInstances {
+    NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).forEach { instance in
       let pid = instance.processIdentifier
+      guard pid != currentProcessId else { return }
+
       logger.warning("terminating multiple instance with pid=\(pid, privacy: .public)")
-      guard instance.terminate() else {
-        logger.warning(
-          "failed to terminate instance with pid=\(pid, privacy: .public), forcing termination"
-        )
-        guard instance.forceTerminate() else {
-          logger.error("failed to force terminate instance with pid=\(pid, privacy: .public)")
-          continue
-        }
-        continue
+
+      guard instance.forceTerminate() else {
+        logger.error("failed to terminate instance with pid=\(pid, privacy: .public)")
+        return
       }
     }
   }
 
-  func applicationDidFinishLaunching(_: Notification) {
-    logger.debug("did finish launching")
+  public func applicationWillFinishLaunching(_: Notification) {
+    terminateOtherInstances()
+  }
+
+  public func applicationDidFinishLaunching(_: Notification) {
+    logger.debug("launched")
 
     Task { @AARMain in
       await AARMain.shared.start()
     }
   }
 
-  func applicationWillTerminate(_: Notification) {
-    logger.debug("will terminate")
+  public func applicationWillTerminate(_: Notification) {
+    logger.debug("terminating")
+
+    terminateOtherInstances()
   }
 
-  func applicationDidUpdate(_: Notification) {
+  public func applicationDidUpdate(_: Notification) {
     guard let modal = NSApplication.shared.modalWindow else {
       if NSApplication.shared.activationPolicy() == .regular {
         logger.debug("did update - deactivate")
@@ -63,20 +63,20 @@ private final class AARApp: NSObject, NSApplicationDelegate, AARLoggable {
 
       NSApplication.shared.setActivationPolicy(.regular)
       NSApplication.shared.activate(ignoringOtherApps: true)
-      modal.makeKeyAndOrderFront(nil)
+      modal.makeKeyAndOrderFront(self)
       modal.collectionBehavior = .moveToActiveSpace
     }
   }
 
-  func applicationDidResignActive(_ n: Notification) {
-    logger.debug("did resign active")
-
+  public func applicationDidResignActive(_: Notification) {
     guard let modal = NSApplication.shared.modalWindow else { return }
+
+    logger.debug("resign active - center modal")
 
     modal.center()
   }
 
-  func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
+  public func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows: Bool) -> Bool {
     if !hasVisibleWindows {
       logger.debug("handle reopen - display agent info")
 
