@@ -35,8 +35,8 @@ private final class AARApp: NSObject, NSApplicationDelegate, Sendable, AARLoggab
   public func applicationDidFinishLaunching(_: Notification) {
     logger.debug("launched")
 
-    Task { @AARMain in
-      await AARMain.shared.start()
+    Task {
+      await AARWorker().start()
     }
   }
 
@@ -81,7 +81,7 @@ private final class AARApp: NSObject, NSApplicationDelegate, Sendable, AARLoggab
       logger.debug("handle reopen - display agent info")
 
       Task {
-        await AARServiceManager.displayAgentInfo()
+        await AARServiceManager.alertAgentInfo()
       }
     }
 
@@ -89,54 +89,50 @@ private final class AARApp: NSObject, NSApplicationDelegate, Sendable, AARLoggab
   }
 }
 
-@globalActor
-private final actor AARMain: GlobalActor, AARLoggable {
-  static public let shared = AARMain()
-
-  private init() {}
-
+private final actor AARWorker: AARLoggable {
   private var task: Task<Void, Never>?
 
   public func start() {
     logger.info("starting")
 
-    task = Task(priority: .background) { @AARMain in
-      await operation()
-    }
+    task = Task(
+      priority: .background,
+      operation: operation
+    )
   }
 
-  private func stop() async {
+  private func stop() {
     logger.info("stopping")
 
-    await withTaskCancellationHandler {
-      task?.cancel()
-    } onCancel: {
-      logger.debug("task cancelled")
+    task?.cancel()
 
-      Task { @AARMain in
-        await NSApplication.shared.terminate(self)
-      }
+    Task {
+      await NSApplication.shared.terminate(self)
     }
   }
 
   private func operation() async {
-    guard await AARServiceManager().ensureAgentStatus() == .success else {
-      return await stop()
+    switch await AARServiceManager().ensureAgentStatus() {
+      case .success:
+        break
+
+      case .failure(.invalidStatus):
+        return stop()
     }
 
-    var isRetry = false
-    while !Task.isCancelled {
-      switch await AARSecurityManager().ensureAccessibilityPermission(isRetry) {
+    while task?.isCancelled == false {
+      switch await AARSecurityManager().ensureAccessibilityPermission() {
         case .success:
           AARNotificationsScanner().scanForAirPlayAlerts()
           await sleep(5)
           break
-        case .failure(retry: true):
-          isRetry = true
+
+        case .failure(.permissionRequested):
           await sleep(10)
           break
-        case .failure(retry: false):
-          return await stop()
+
+        case .failure(.permissionRefused):
+          return stop()
       }
     }
   }

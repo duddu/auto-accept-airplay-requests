@@ -3,40 +3,44 @@ import ServiceManagement.SMAppService
 public struct AARServiceManager: AARLoggable {
   private let agent: SMAppService = .agent(plistName: "LaunchAgent.plist")
 
-  @frozen public enum Result: Sendable {
-    case success
-    case failure
+  @frozen public enum AgentError: Error {
+    case invalidStatus
   }
 
+  public typealias Result = Swift.Result<Void, AgentError>
+
   public func ensureAgentStatus() async -> Result {
-    logger.debug("service status \(agent.status.rawValue)")
+    logger.debug("ensuring agent status")
 
     switch agent.status {
       case .enabled:
-        return .success
+        logger.debug("service status enabled")
+        return .success(())
 
       case .requiresApproval:
-        await handleBackgroundItemDisabled()
-        return .failure
+        logger.error("service status disabled")
+        await handleAgentDisabled()
+        break
 
       default:
+        logger.error("service status \(agent.status.rawValue)")
         await handleAgentRegistration()
-        return .failure
+        break
     }
+
+    return .failure(.invalidStatus)
   }
 
-  private func handleBackgroundItemDisabled() async {
-    logger.error("background item disabled")
-
-    await displayAgentError(
+  private func handleAgentDisabled() async {
+    await alertAgentError(
       error: "Background process not allowed",
       message:
-        "This app needs to run in the background in order to accept incoming AirPlay notifications on this computer.\nPlease go to System Settings > General > Login Items to allow it."
+        "This app needs permission to run in the background in order to accept incoming AirPlay notifications on this computer.\nPlease go to System Settings > General > Login Items to allow it."
     )
   }
 
   private func handleAgentRegistration() async {
-    logger.debug("try registration")
+    logger.debug("trying agent registration")
 
     do {
       // @TODO if status != .notRegistered try? await agent.unregister() first
@@ -47,7 +51,7 @@ public struct AARServiceManager: AARLoggable {
     } catch let error {
       logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
 
-      await displayAgentError(
+      await alertAgentError(
         error: "Launch Agent registration failed",
         message:
           "This app was unable to register the service to manage the background process.\nPlease check in System Settings > General > Login Items if it's already been registered, or try again after a system reboot.",
@@ -56,7 +60,7 @@ public struct AARServiceManager: AARLoggable {
     }
   }
 
-  private func displayAgentError(
+  private func alertAgentError(
     error: String,
     message: String,
     cause: (any Error)? = nil
@@ -77,11 +81,11 @@ public struct AARServiceManager: AARLoggable {
     }
   }
 
-  static public func displayAgentInfo() async {
+  static public func alertAgentInfo() async {
     if await AARAlert.display(
       style: .informational,
-      title: "App already running in the background",
-      message: "To manage the background process go to System Settings > General > Login Items.",
+      title: "Application running in the background",
+      message: "This app is currently already running as a background process, waiting for AirPlay notifications requests to accept.\nTo manage this process, or prevent it from automatically start when you log in, open System Settings > General > Login Items.",
       okButtonTitle: "Got it",
       cancelButtonTitle: "Open Login Items Settings"
     ) == .cancel {
