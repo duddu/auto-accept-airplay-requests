@@ -2,15 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AARDocumentationUrl</key>
+	<string>${AAR_DOCS_URL}</string>
+	<key>AARLaunchAgentPlist</key>
+	<string>${AAR_LAUNCH_AGENT_LABEL}.plist</string>
+	<key>AARRepositoryUrl</key>
+	<string>${AAR_REPO_URL}</string>
 	<key>CFBundleIconFile</key>
 	<string>BundleIcon</string>
-	<key>LSEnvironment</key>
-	<dict>
-		<key>AARDocumentationUrl</key>
-		<string>${AAR_DOCS_URL}</string>
-		<key>AARRepositoryUrl</key>
-		<string>${AAR_REPO_URL}</string>
-	</dict>
 	<key>LSMinimumSystemVersion</key>
 	<string>13</string>
 	<key>LSMultipleInstancesProhibited</key>

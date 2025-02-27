@@ -1,7 +1,7 @@
 import ServiceManagement.SMAppService
 
 public struct AARServiceManager: AARLoggable {
-  private let agent: SMAppService = .agent(plistName: "LaunchAgent.plist")
+  private let agent: SMAppService = .agent(plistName: AARBundle().launchAgentPlist)
 
   @frozen public enum AgentError: Error {
     case invalidStatus

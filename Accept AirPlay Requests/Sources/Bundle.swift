@@ -11,7 +11,8 @@ public struct AARBundle: AARLoggable {
   public var name: String { value(for: kCFBundleNameKey) }
   public var version: String { value(for: "CFBundleShortVersionString") }
   public var buildNumber: String { value(for: kCFBundleVersionKey) }
-  public var docsUrl: String { value(for: "LSEnvironment.AARDocumentationUrl") }
+  public var launchAgentPlist: String { value(for: "AARLaunchAgentPlist") }
+  public var docsUrl: String { value(for: "AARDocumentationUrl") }
 
   private func value(for keyPath: String) -> String {
     guard
@@ -19,7 +20,7 @@ public struct AARBundle: AARLoggable {
       let value = info.value(forKeyPath: keyPath) as? String,
       !value.isEmpty
     else {
-      logger.error("failed to get Info.plist value for \(keyPath)")
+      logger.error("failed to get info dictionary value for \(keyPath)")
       return "unknown"
     }
     return value

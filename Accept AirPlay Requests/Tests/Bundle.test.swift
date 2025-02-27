@@ -3,49 +3,57 @@ import Testing
 
 @Suite struct AARBundleTests {
   @Suite struct ValuesExist {
-    private let TestBundle: AARBundle = .init(infoDictionary: [
-      "CFBundleName": "nameStub",
-      "CFBundleShortVersionString": "versionStub",
-      "CFBundleVersion": "buildNumberStub",
-      "LSEnvironment": [
-        "AARDocumentationUrl": "docsUrlStub"
-      ]
+    private let testBundle: AARBundle = .init(infoDictionary: [
+      "AARDocumentationUrl": "docs-url-stub",
+      "AARLaunchAgentPlist": "launch-agent-plist-stub",
+      "CFBundleName": "name-stub",
+      "CFBundleShortVersionString": "version-stub",
+      "CFBundleVersion": "build-number-stub"
     ])
 
     @Test func name() {
-      #expect(TestBundle.name == "nameStub")
+      #expect(testBundle.name == "name-stub")
     }
 
     @Test func version() {
-      #expect(TestBundle.version == "versionStub")
+      #expect(testBundle.version == "version-stub")
     }
 
     @Test func buildNumber() {
-      #expect(TestBundle.buildNumber == "buildNumberStub")
+      #expect(testBundle.buildNumber == "build-number-stub")
+    }
+
+    @Test func launchAgentPlist() {
+      #expect(testBundle.launchAgentPlist == "launch-agent-plist-stub")
     }
 
     @Test func docsUrl() {
-      #expect(TestBundle.docsUrl == "docsUrlStub")
+      #expect(testBundle.docsUrl == "docs-url-stub")
     }
   }
 
   @Suite struct ValuesDoNotExist {
-    private let TestBundle: AARBundle = .init(infoDictionary: [:])
+    private let testBundle: AARBundle = .init(infoDictionary: [:])
+    private let unknownValue: String = "unknown"
 
     @Test func name() {
-      #expect(TestBundle.name == "unknown")
+      #expect(testBundle.name == unknownValue)
     }
 
     @Test func version() {
-      #expect(TestBundle.version == "unknown")
+      #expect(testBundle.version == unknownValue)
     }
 
     @Test func buildNumber() {
-      #expect(TestBundle.buildNumber == "unknown")
+      #expect(testBundle.buildNumber == unknownValue)
+    }
+
+    @Test func launchAgentPlist() {
+      #expect(testBundle.launchAgentPlist == unknownValue)
     }
 
     @Test func docsUrl() {
-      #expect(TestBundle.docsUrl == "unknown")
+      #expect(testBundle.docsUrl == unknownValue)
     }
   }
 }

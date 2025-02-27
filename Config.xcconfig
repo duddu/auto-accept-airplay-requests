@@ -3,6 +3,7 @@ AAR_BUILD_NUMBER = 2502170313
 AAR_BUNDLE_ID = dev.duddu.AcceptAirPlayRequests
 AAR_BUNDLE_NAME = Accept AirPlay Requests
 AAR_BUNDLE_DISPLAY_NAME = (Auto) Accept AirPlay Requests
+AAR_LAUNCH_AGENT_LABEL = ${AAR_BUNDLE_ID}.LaunchAgent
 AAR_REPO_NAME = auto-accept-airplay-requests
 AAR_REPO_URL = github.com/duddu/${AAR_REPO_NAME}
 AAR_DOCS_URL = ${AAR_REPO_NAME}.duddu.dev

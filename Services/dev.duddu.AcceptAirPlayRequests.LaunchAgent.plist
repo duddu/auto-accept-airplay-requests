@@ -3,15 +3,19 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>${PRODUCT_BUNDLE_IDENTIFIER}.LaunchAgent</string>
+	<string>${AAR_LAUNCH_AGENT_LABEL}</string>
 	<key>AssociatedBundleIdentifiers</key>
 	<string>${PRODUCT_BUNDLE_IDENTIFIER}</string>
 	<key>BundleProgram</key>
 	<string>${BUNDLE_EXECUTABLE_FOLDER_PATH}/${EXECUTABLE_NAME}</string>
 	<key>ProcessType</key>
 	<string>Background</string>
-	<key>RunAtLoad</key>
+	<key>LowPriorityIO</key>
 	<true/>
+	<key>LowPriorityBackgroundIO</key>
+	<true/>
+	<key>RunAtLoad</key>
+	<false/>
 	<key>KeepAlive</key>
 	<dict>
 		<key>SuccessfulExit</key>

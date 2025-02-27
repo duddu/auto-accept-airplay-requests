@@ -7,31 +7,32 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D2520BF2D643CC300A24B33 /* Accept AirPlay Requests */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in Copy Executable File */ = {isa = PBXBuildFile; fileRef = 4D2520BF2D643CC300A24B33 /* Accept AirPlay Requests */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4D54FB262D33847B009C5A1E /* BundleIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FB252D33847B009C5A1E /* BundleIcon.icns */; };
 		4D74AC7C2CA389B70013FA58 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7A2CA389B70013FA58 /* LICENSE */; };
 		4D74AC7D2CA389B70013FA58 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4D74AC7B2CA389B70013FA58 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4D9EC97E2C9B97BA00D8B522 /* Copy Files */ = {
+		4D9EC97E2C9B97BA00D8B522 /* Copy Launch Agent Plist File */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Contents/Library/LaunchAgents;
 			dstSubfolderSpec = 1;
 			files = (
 			);
-			name = "Copy Files";
+			name = "Copy Launch Agent Plist File";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4D9EC9872C9BAF7300D8B522 /* CopyFiles */ = {
+		4D9EC9872C9BAF7300D8B522 /* Copy Executable File */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in CopyFiles */,
+				4D23E6012D6B632B003B7CB9 /* Accept AirPlay Requests in Copy Executable File */,
 			);
+			name = "Copy Executable File";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -59,24 +60,24 @@
 			);
 			target = 4D9EC9602C9B5D7C00D8B522 /* Accept AirPlay Requests */;
 		};
-		4D9BE75B2D3A6C0600768A12 /* Exceptions for "Service" folder in "Accept AirPlay Requests" target */ = {
+		4D9BE75B2D3A6C0600768A12 /* Exceptions for "Services" folder in "Accept AirPlay Requests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				LaunchAgent.plist,
+				dev.duddu.AcceptAirPlayRequests.LaunchAgent.plist,
 			);
 			target = 4D9EC9602C9B5D7C00D8B522 /* Accept AirPlay Requests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		4D9BE75A2D3A6C0300768A12 /* Exceptions for "Service" folder in "Copy Files" phase from "Accept AirPlay Requests" target */ = {
+		4D9BE75A2D3A6C0300768A12 /* Exceptions for "Services" folder in "Copy Launch Agent Plist File" phase from "Accept AirPlay Requests" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			attributesByRelativePath = {
-				LaunchAgent.plist = (CodeSignOnCopy, );
+				dev.duddu.AcceptAirPlayRequests.LaunchAgent.plist = (CodeSignOnCopy, );
 			};
-			buildPhase = 4D9EC97E2C9B97BA00D8B522 /* Copy Files */;
+			buildPhase = 4D9EC97E2C9B97BA00D8B522 /* Copy Launch Agent Plist File */;
 			membershipExceptions = (
-				LaunchAgent.plist,
+				dev.duddu.AcceptAirPlayRequests.LaunchAgent.plist,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -90,13 +91,13 @@
 			path = Scripts;
 			sourceTree = "<group>";
 		};
-		4DDD007A2D31DC42003D7C28 /* Service */ = {
+		4DDD007A2D31DC42003D7C28 /* Services */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4D9BE75B2D3A6C0600768A12 /* Exceptions for "Service" folder in "Accept AirPlay Requests" target */,
-				4D9BE75A2D3A6C0300768A12 /* Exceptions for "Service" folder in "Copy Files" phase from "Accept AirPlay Requests" target */,
+				4D9BE75B2D3A6C0600768A12 /* Exceptions for "Services" folder in "Accept AirPlay Requests" target */,
+				4D9BE75A2D3A6C0300768A12 /* Exceptions for "Services" folder in "Copy Launch Agent Plist File" phase from "Accept AirPlay Requests" target */,
 			);
-			path = Service;
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -117,7 +118,7 @@
 			children = (
 				4D9EC9662C9B5D9B00D8B522 /* Accept AirPlay Requests */,
 				4D54FB402D3430D1009C5A1E /* Scripts */,
-				4DDD007A2D31DC42003D7C28 /* Service */,
+				4DDD007A2D31DC42003D7C28 /* Services */,
 				4D54FB252D33847B009C5A1E /* BundleIcon.icns */,
 				4D54FB1C2D33847B009C5A1E /* Config.xcconfig */,
 				4D54FB202D33847B009C5A1E /* Info.plist */,
@@ -147,9 +148,9 @@
 				4D9EC95D2C9B5D7C00D8B522 /* Sources */,
 				4D9EC95E2C9B5D7C00D8B522 /* Frameworks */,
 				4D9EC95F2C9B5D7C00D8B522 /* Resources */,
-				4D9EC9872C9BAF7300D8B522 /* CopyFiles */,
-				4D9EC97E2C9B97BA00D8B522 /* Copy Files */,
-				4D3191E22D6414D700B1B747 /* ShellScript */,
+				4D9EC9872C9BAF7300D8B522 /* Copy Executable File */,
+				4D9EC97E2C9B97BA00D8B522 /* Copy Launch Agent Plist File */,
+				4D3191E22D6414D700B1B747 /* Interpolate Config Variables In Launch Agent Plist */,
 			);
 			buildRules = (
 			);
@@ -158,7 +159,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				4D54FB402D3430D1009C5A1E /* Scripts */,
-				4DDD007A2D31DC42003D7C28 /* Service */,
+				4DDD007A2D31DC42003D7C28 /* Services */,
 			);
 			name = "Accept AirPlay Requests";
 			packageProductDependencies = (
@@ -219,7 +220,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4D3191E22D6414D700B1B747 /* ShellScript */ = {
+		4D3191E22D6414D700B1B747 /* Interpolate Config Variables In Launch Agent Plist */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -229,6 +230,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Interpolate Config Variables In Launch Agent Plist";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -236,7 +238,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#!/usr/bin/env bash\n\nset -e\nset -u\n\nBUNDLE_DIR=\"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH\"\nAGENT_PLIST_PATH=\"$BUNDLE_DIR/Library/LaunchAgents/LaunchAgent.plist\"\n\necho \"$(/opt/homebrew/bin/envsubst < \"$AGENT_PLIST_PATH\")\" > \"$AGENT_PLIST_PATH\"\n";
+			shellScript = "#!/usr/bin/env bash\n\nset -e\nset -u\n\nPATH=\"$PATH:/opt/homebrew/bin\"\nLAUNCH_AGENTS_DIR=\"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchAgents\"\nLAUNCH_AGENT_PLIST=\"$LAUNCH_AGENTS_DIR/$AAR_LAUNCH_AGENT_LABEL.plist\"\n\nif [ ! -f \"$LAUNCH_AGENT_PLIST\" ]; then\n  >&2 echo \"Launch Agent Plist file not found at $LAUNCH_AGENT_PLIST\"; exit 1\nfi\n\nenvsubst < \"$LAUNCH_AGENT_PLIST\" | sponge \"$LAUNCH_AGENT_PLIST\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
