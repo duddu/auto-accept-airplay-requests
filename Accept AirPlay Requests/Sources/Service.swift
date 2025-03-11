@@ -1,13 +1,14 @@
 import ServiceManagement.SMAppService
 
-public struct AARServiceManager: AARLoggable {
-  private let agent: SMAppService = .agent(plistName: AARBundle().launchAgentPlist)
-
+public struct AARServiceManager: Sendable, AARLoggable {
   @frozen public enum AgentError: Error {
     case invalidStatus
   }
 
   public typealias Result = Swift.Result<Void, AgentError>
+
+  private var agentPlist: String { AARBundle().launchAgentLabel + ".plist" }
+  private var agent: SMAppService { .agent(plistName: agentPlist) }
 
   public func ensureAgentStatus() async -> Result {
     logger.debug("ensuring agent status")
