@@ -1,55 +1,70 @@
-import AppKit.NSApplication
+public final actor AARBackgroundWorker: GlobalActor, AARLoggable {
+  private typealias WorkPauseTimeInterval = Double
 
-public final actor AARWorker: AARLoggable {
-  private var task: Task<Void, Never>?
+  private var work: Task<Void, Never>?
 
-  public func start() {
-    logger.info("starting")
+  public static let shared = AARBackgroundWorker()
 
-    task = Task(
-      priority: .background,
-      operation: operation
-    )
+  private init() {}
+
+  deinit {
+    Self.logger.debug("actor deinitialized")
   }
 
-  private func stop() {
-    logger.info("stopping")
-
-    task?.cancel()
-
-    Task {
-      await NSApplication.shared.terminate(self)
-    }
-  }
-
-  private func operation() async {
-    switch await AARServiceManager().ensureAgentStatus() {
-      case .success:
-        break
-
-      case .failure(.invalidStatus):
-        return stop()
+  public func start(onEndCallback: @escaping @Sendable () async -> Void) {
+    if let work {
+      logger.debug("cancelling work before restart")
+      work.cancel()
     }
 
-    while task?.isCancelled == false {
-      switch await AARSecurityManager().ensureAccessibilityPermission() {
-        case .success:
-          AARNotificationsScanner().scanForAirPlayAlerts()
-          await sleep(5)
-          break
+    logger.debug("starting work task")
 
-        case .failure(.permissionRequested):
-          await sleep(10)
-          break
-
-        case .failure(.permissionRefused):
-          return stop()
+    work = Task(priority: .background) {
+      do {
+        try await runOnIntervalUntilCancelled()
+      } catch is CancellationError {
+        logger.debug("work task cancelled")
+      } catch {
+        logger.debug("work task ended with \(type(of: error), privacy: .public)")
+        Task.detached(operation: onEndCallback)
       }
     }
   }
 
-  private func sleep(_ seconds: Double) async {
-    try? await Task.sleep(
+  private func runOnIntervalUntilCancelled() async throws {
+    while !Task.isCancelled {
+      let interval = try await handleAirPlayRequests()
+
+      try await pause(for: interval)
+    }
+  }
+
+  private func handleAirPlayRequests() async throws -> WorkPauseTimeInterval {
+    switch await AARServiceManager().ensureAgentStatus() {
+      case .success:
+        break
+
+      case .failure(let serviceError):
+        throw serviceError
+    }
+
+    try Task.checkCancellation()
+
+    switch await AARSecurityManager().ensureAccessibilityPermission() {
+      case .success:
+        AARNotificationsScanner().scanForAirPlayAlerts()
+        return 5
+
+      case .failure(.permissionRequested):
+        return 10
+
+      case .failure(let securityError):
+        throw securityError
+    }
+  }
+
+  private func pause(for seconds: WorkPauseTimeInterval) async throws {
+    try await Task.sleep(
       for: .seconds(seconds),
       tolerance: .seconds(seconds / 5)
     )

@@ -14,5 +14,10 @@
 	<string>13</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<true/>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>AAR_PROCESS_LABEL</key>
+		<string>${AAR_BUNDLE_ID}</string>
+	</dict>
 </dict>
 </plist>

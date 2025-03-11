@@ -1,7 +1,7 @@
 import AppKit.NSWorkspace
 import ApplicationServices.HIServices
 
-public struct AARSecurityManager: AARLoggable {
+public struct AARSecurityManager: Sendable, AARLoggable {
   @frozen public enum AccessibilityError: Error {
     case permissionRefused
     case permissionRequested
@@ -17,7 +17,7 @@ public struct AARSecurityManager: AARLoggable {
       return .success(())
     }
 
-    if await alertAccessibilityWarning() != .OK {
+    if await displayAccessibilityWarning() != .OK {
       logger.error("accessibility permission refused")
       return .failure(.permissionRefused)
     }
@@ -33,11 +33,11 @@ public struct AARSecurityManager: AARLoggable {
     return .failure(.permissionRequested)
   }
 
-  private func alertAccessibilityWarning() async -> AARAlert.Response {
+  private func displayAccessibilityWarning() async -> AARAlert.Response {
     await AARAlert.display(
       style: .warning,
       title: "Accessibility permission required",
-      message: "This app needs your permission to accept the incoming AirPlay requests notifications.\nPlease go to System Settings > Privacy & Security > Accessibility to authorize it.",
+      message: "This app needs your permission to accept the incoming AirPlay requests notifications.\nPlease open System Settings > Privacy & Security > Accessibility to authorize it.",
       okButtonTitle: "Open Accessibility Settings",
       cancelButtonTitle: "Terminate"
     )
