@@ -2,10 +2,10 @@
 
 set -e
 
+exit_with_error() { >&2 echo -e "❌ ${1}"; exit 1; }
+
 if [ -z "${1:-}" ]; then
-  >&2 echo '❌ At least one key-value pair required as input'
-  >&2 echo -e "\n\t$ $(basename "$0") <key>=<new_value> [<key>=<new_value>, ...]\n"
-  exit 1
+  exit_with_error "Missing input. Expected key-value pair(s):\n\t> ./$(basename "$0") <key>=<new_value> [<key>=<new_value>, ...]"
 fi
 
 set -u
@@ -15,7 +15,7 @@ CONFIG_PATH="$PROJECT_ROOT/Config.xcconfig"
 
 for PAIR in "$@"; do
   if [[ "$PAIR" != *=* ]]; then
-    >&2 echo "❌ Invalid input format: $PAIR. Expected <key>=<value>"; exit 1
+    exit_with_error "Invalid input format: '$PAIR'. Expected <key>=<value>"
   fi
 
   IFS='=' read -ra PAIR_ARRAY <<< "$PAIR"
@@ -23,10 +23,10 @@ for PAIR in "$@"; do
   NEW_VALUE=${PAIR_ARRAY[1]}
 
   if (! grep -q "^$KEY =" "$CONFIG_PATH"); then
-    >&2 echo "❌ Key $KEY not found in $CONFIG_PATH"; exit 1
+    exit_with_error "Key $KEY not found in $CONFIG_PATH"
   fi
 
-  echo "⚙️ Updating config entry $KEY to \"$NEW_VALUE\" in $CONFIG_PATH"
+  echo "⚙️ Updating config entry $KEY to \"$NEW_VALUE\" in '$CONFIG_PATH'"
 
   sed -i '' -e "/$KEY =/ s/= .*/= $NEW_VALUE/" "$CONFIG_PATH"
 done
