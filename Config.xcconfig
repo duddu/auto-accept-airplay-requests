@@ -1,5 +1,5 @@
-AAR_VERSION = 1.1.1
-AAR_BUILD_NUMBER = 2502170313
+AAR_VERSION = 1.2.0
+AAR_BUILD_NUMBER = 2503120450
 AAR_BUNDLE_ID = dev.duddu.AcceptAirPlayRequests
 AAR_BUNDLE_NAME = Accept AirPlay Requests
 AAR_BUNDLE_DISPLAY_NAME = (Auto) Accept AirPlay Requests
