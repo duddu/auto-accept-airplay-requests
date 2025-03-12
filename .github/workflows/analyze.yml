@@ -1,12 +1,20 @@
-name: Static Code Analysis
+name: Code Analysis
 
 on:
   push:
     branches:
       - latest
+    paths:
+      - '.github/workflows/**.yml'
+      - 'Accept AirPlay Requests/**.swift'
+      - 'Docs/**.ts'
   pull_request:
     branches:
       - latest
+    paths:
+      - '.github/workflows/**.yml'
+      - 'Accept AirPlay Requests/**.swift'
+      - 'Docs/**.ts'
 
 permissions:
   contents: read
@@ -20,8 +28,6 @@ defaults:
   
 jobs:
   codeql:
-    name: CodeQL (${{ matrix.language }})
-    runs-on: ${{ matrix.runner || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -33,9 +39,11 @@ jobs:
           - language: TypeScript
             source-root: 'Docs/.vuepress'
           - language: Actions
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ${{ matrix.runner || 'ubuntu-latest' }}
     concurrency:
-      group: ${{ github.workflow_ref }}--${{ matrix.language }}
-      cancel-in-progress: true
+      group: ${{ github.workflow }}-${{ github.ref_name }}-${{ matrix.language }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     timeout-minutes: 30
     steps:
       - name: Checkout

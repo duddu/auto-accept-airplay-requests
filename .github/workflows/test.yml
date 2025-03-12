@@ -4,13 +4,19 @@ on:
   push:
     branches:
       - latest
+    paths:
+      - '.github/workflows/test.yml'
+      - 'Accept AirPlay Requests/**'
   pull_request:
     branches:
       - latest
+    paths:
+      - '.github/workflows/test.yml'
+      - 'Accept AirPlay Requests/**'
 
 concurrency:
-  group: ${{ github.workflow_ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -24,14 +30,16 @@ jobs:
   swift:
     name: Swift Testing
     runs-on: macos-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      SWIFT_VERSION: '6'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Swift
+      - name: Setup Swift ${{ env.SWIFT_VERSION }}
         uses: swift-actions/setup-swift@d4537ff835c9778c934e48f78639e270edd5839e
         with:
-          swift-version: 6
-      - name: Swift Test Package
+          swift-version: ${{ env.SWIFT_VERSION }}
+      - name: Test Swift Package
         working-directory: 'Accept AirPlay Requests'
         run: swift test -v

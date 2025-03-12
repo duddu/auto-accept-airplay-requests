@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - latest
+    paths-ignore:
+      - 'Scripts/**'
   pull_request:
     branches:
       - latest
-
-concurrency:
-  group: ${{ github.workflow_ref }}
-  cancel-in-progress: false
+    paths-ignore:
+      - 'Scripts/**'  
 
 permissions:
   contents: read
@@ -25,7 +25,7 @@ jobs:
   build:
     name: VuePress Build
     runs-on: macos-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       DOCS_DIR: ${{ github.workspace }}/Docs
     steps:
@@ -43,20 +43,21 @@ jobs:
       - name: Build VuePress static site
         working-directory: ${{ env.DOCS_DIR }}
         run: npm run build
-      - if: github.ref_name == 'latest'
-        name: Setup GitHub Pages
-        uses: actions/configure-pages@v5  
-      - if: github.ref_name == 'latest'
+      - if: github.event_name == 'push'
         name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.DOCS_DIR }}/.vuepress/dist
 
   deploy:
-    if: github.ref_name == 'latest'
+    if: github.event_name == 'push'
     name: Deploy to Pages
     runs-on: ubuntu-latest
     needs: build
+    timeout-minutes: 15
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deploy-pages.outputs.page_url }}
