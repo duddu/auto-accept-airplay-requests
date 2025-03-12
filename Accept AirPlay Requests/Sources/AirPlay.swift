@@ -1,14 +1,10 @@
-import AppKit.NSApplication
 import AppKit.NSRunningApplication
-import AppKit.NSWorkspace
 import ApplicationServices.HIServices
 
-public struct AARNotificationsScanner: AARLoggable {
-  private let notificationCenterBundleId = "com.apple.notificationcenterui"
-
+public struct AARNotificationsScanner: Sendable, AARLoggable {
   public func scanForAirPlayAlerts() {
-    if let notificationCenterWindow = getNotificationCenterFirstWindow() {
-      logger.debug("scanning for airplay notifications")
+    if let notificationCenterWindow = getNotificationCenterWindow() {
+      logger.debug("scanning for airplay requests alerts")
       findAndActionAirPlayAlert(in: notificationCenterWindow)
     }
   }
@@ -22,15 +18,15 @@ public struct AARNotificationsScanner: AARLoggable {
 
       for name in actionNames {
         guard validateNotificationAction(of: child, name: name) else { continue }
-        logger.info("action validation passed")
+        logger.debug("action validation passed")
 
         guard validateNotificationAttributes(of: child) else { continue }
-        logger.info("attributes validation passed")
+        logger.debug("attributes validation passed")
 
         let performResult = AXUIElementPerformAction(child, name)
         guard performResult == .success else {
           logger.error(
-            "action perform failed (AXError code: \(performResult.rawValue, privacy: .public)"
+            "perform action failed with axerror code=\(performResult.rawValue, privacy: .public)"
           )
           continue
         }
@@ -45,9 +41,7 @@ public struct AARNotificationsScanner: AARLoggable {
 
   private func validateNotificationAction(of element: AXUIElement, name: CFString) -> Bool {
     guard
-      String(describing: name)
-        .lowercased()
-        .starts(with: "name:accept")
+      String(describing: name).lowercased().starts(with: "name:accept")
     else { return false }
 
     logger.debug("action name matched: \(String(describing: name), privacy: .public)")
@@ -122,11 +116,20 @@ public struct AARNotificationsScanner: AARLoggable {
     return true
   }
 
-  private func getNotificationCenterFirstWindow() -> AXUIElement? {
+  private func getUIElementChildren(of element: AXUIElement) -> [AXUIElement] {
+    var children: CFTypeRef?
+    AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children)
+
+    return children as? [AXUIElement] ?? []
+  }
+
+  // @TODO try AXObserverAddNotification on getNotificationCenterApplication()
+  private func getNotificationCenterWindow() -> AXUIElement? {
     guard
-      let notificationCenterUIElement = getApplicationUIElement(for: notificationCenterBundleId)
+      let notificationCenterUIElement = getNotificationCenterApplication()
     else { return nil }
 
+    // @TODO use kAXMainWindowAttribute
     var windowsRef: CFTypeRef?
     AXUIElementCopyAttributeValue(
       notificationCenterUIElement, kAXWindowsAttribute as CFString, &windowsRef
@@ -135,29 +138,27 @@ public struct AARNotificationsScanner: AARLoggable {
     guard
       let windows = windowsRef as? [AXUIElement], !windows.isEmpty
     else {
-      logger.debug("no notification center active windows")
+      logger.debug("notification center has no active windows")
       return nil
     }
 
     return windows.first
   }
 
-  private func getUIElementChildren(of element: AXUIElement) -> [AXUIElement] {
-    var children: CFTypeRef?
-    AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children)
+  private func getNotificationCenterApplication() -> AXUIElement? {
+    let notificationCenterBundleId = "com.apple.notificationcenterui"
+    let notificationCenterApplication = NSRunningApplication.runningApplications(
+      withBundleIdentifier: notificationCenterBundleId
+    ).first
 
-    return children as? [AXUIElement] ?? []
-  }
-
-  private func getApplicationUIElement(for bundleId: String) -> AXUIElement? {
     guard
-      let runningApp: NSRunningApplication = NSWorkspace.shared.runningApplications.first(
-        where: { $0.bundleIdentifier == bundleId }
-      )
+      let notificationCenterPid = notificationCenterApplication?.processIdentifier
     else {
-      logger.error("no app with bundle id \(bundleId) is running")
+      logger.error(
+        "failed to find notification center application with bundle id \(notificationCenterBundleId)"
+      )
       return nil
     }
-    return AXUIElementCreateApplication(runningApp.processIdentifier)
+    return AXUIElementCreateApplication(notificationCenterPid)
   }
 }
