@@ -106,27 +106,24 @@ public struct AARServiceManager: Sendable, AARLoggable {
   public func displayAgentRunningEnabledInfo() async {
     await displayAgentInfo(
       info: "App running in the background",
-      message: "This application is currently already running as a background process, waiting for AirPlay requests to accept.\nTo manage it go to System Settings > General > Login Items."
+      message: "This application is currently already running as a background process, waiting for AirPlay requests to accept.\nTo manage it go to System Settings > General > Login Items (click the second button below)."
     )
   }
 
   private func displayAgentEnabledRegisteredInfo() async {
     await displayAgentInfo(
       info: "Background process registered",
-      message: "This application will now run in the background, waiting for AirPlay requests to accept.\nTo manage it, and turn off the auto-launch at login, go to System Settings > General > Login Items."
+      message: "This application will now run in the background, waiting for AirPlay requests to accept.\nTo manage it, and turn off the auto-launch at login, go to System Settings > General > Login Items (click the second button below)."
     )
   }
 
   private func displayAgentInfo(info: String, message: String) async {
-    if
-      await AARAlert.display(
-        style: .informational,
-        title: info,
-        message: message,
-        okButtonTitle: "OK",
-        cancelButtonTitle: "Open Login Items Settings"
-      ) == .cancel
-    {
+    if await AARAlert(
+      style: .informational,
+      title: info,
+      message: message,
+      buttons: ["OK", "Open Login Items Settings"]
+    ).run() == .button2 {
       SMAppService.openSystemSettingsLoginItems()
     }
   }
@@ -146,23 +143,18 @@ public struct AARServiceManager: Sendable, AARLoggable {
     )
   }
 
-  private func displayAgentError(
-    error: String,
-    message: String,
-    cause: (any Error)? = nil
-  ) async {
+  private func displayAgentError(error: String, message: String, cause: Error? = nil) async {
     var message = message
     if let cause {
-      message += "\n[ Error: \"\(cause.localizedDescription)\" ]"
+      message += "\n( Error: \"\(cause.localizedDescription)\" )"
     }
 
-    if await AARAlert.display(
+    if await AARAlert(
       style: .critical,
       title: error,
       message: message,
-      okButtonTitle: "Open Login Items Settings",
-      cancelButtonTitle: "Cancel"
-    ) == .OK {
+      buttons: ["Open Login Items Settings", "Cancel"]
+    ).run() == .button1 {
       SMAppService.openSystemSettingsLoginItems()
     }
   }

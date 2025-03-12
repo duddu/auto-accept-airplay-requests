@@ -1,5 +1,6 @@
 import AppKit.NSWorkspace
 import ApplicationServices.HIServices
+import ServiceManagement.SMAppService
 
 public struct AARSecurityManager: Sendable, AARLoggable {
   @frozen public enum AccessibilityError: Error {
@@ -17,29 +18,34 @@ public struct AARSecurityManager: Sendable, AARLoggable {
       return .success(())
     }
 
-    if await displayAccessibilityWarning() != .OK {
+    let alertResponse = await displayAccessibilityWarning()
+
+    if alertResponse == .button2 {
       logger.error("accessibility permission refused")
+      SMAppService.openSystemSettingsLoginItems()
       return .failure(.permissionRefused)
     }
 
-    if let privacyAccessibilityPanelUrl = URL(
-      string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-    ) {
-      logger.debug("opening accessibility permission settings")
+    if
+      alertResponse == .button1,
+      let privacyAccessibilityPanelUrl = URL(
+        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+      )
+    {
+      logger.debug("opening accessibility settings")
       NSWorkspace.shared.open(privacyAccessibilityPanelUrl)
     }
 
-    logger.warning("accessibility permission not granted")
+    logger.debug("accessibility permission requested")
     return .failure(.permissionRequested)
   }
 
   private func displayAccessibilityWarning() async -> AARAlert.Response {
-    await AARAlert.display(
+    await AARAlert(
       style: .warning,
       title: "Accessibility permission required",
-      message: "This app needs your permission to accept the incoming AirPlay requests notifications.\nPlease open System Settings > Privacy & Security > Accessibility to authorize it.",
-      okButtonTitle: "Open Accessibility Settings",
-      cancelButtonTitle: "Terminate"
-    )
+      message: "This app needs your approval to accept the incoming AirPlay requests notifications. Please use the first button below to open System Settings > Privacy & Security > Accessibility, where you can toggle on this app.\nIf instead you changed your mind and prefer to disable this app from running, the second button will open for you System Settings > General > Login Items, where you can completely disable this app from running in the background.",
+      buttons: ["Open Accessibility Settings", "Open Login Items Settings"]
+    ).run()
   }
 }
