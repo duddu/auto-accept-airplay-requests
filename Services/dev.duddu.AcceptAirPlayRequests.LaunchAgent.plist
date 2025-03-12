@@ -8,14 +8,17 @@
 	<string>${PRODUCT_BUNDLE_IDENTIFIER}</string>
 	<key>BundleProgram</key>
 	<string>${BUNDLE_EXECUTABLE_FOLDER_PATH}/${EXECUTABLE_NAME}</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>AAR_PROCESS_LABEL</key>
+		<string>${AAR_LAUNCH_AGENT_LABEL}</string>
+		<key>AAR_PROCESS_IS_AGENT</key>
+		<string>1</string>
+	</dict>
 	<key>ProcessType</key>
 	<string>Background</string>
-	<key>LowPriorityIO</key>
-	<true/>
-	<key>LowPriorityBackgroundIO</key>
-	<true/>
 	<key>RunAtLoad</key>
-	<false/>
+	<true/>
 	<key>KeepAlive</key>
 	<dict>
 		<key>SuccessfulExit</key>

@@ -1,59 +1,70 @@
+import Foundation
 import Testing
 @testable import Accept_AirPlay_Requests
 
+class BundleMock: Foundation.Bundle, @unchecked Sendable {
+  private let _infoDictionaryStub: [String: String]
+
+  init(withInfoDictionary infoDictionary: [String: String]) {
+    self._infoDictionaryStub = infoDictionary
+    super.init()
+  }
+
+  override var infoDictionary: [String: Any] { _infoDictionaryStub }
+}
+
 @Suite struct AARBundleTests {
-  @Suite struct ValuesExist {
-    private let testBundle: AARBundle = .init(infoDictionary: [
-      "AARDocumentationUrl": "docs-url-stub",
-      "AARLaunchAgentPlist": "launch-agent-plist-stub",
-      "CFBundleName": "name-stub",
-      "CFBundleShortVersionString": "version-stub",
-      "CFBundleVersion": "build-number-stub"
-    ])
+  protocol AARBundleTestsSuite {
+    var testBundle: AARBundle { get }
+    func testValues() -> ()
+  }
 
-    @Test func name() {
-      #expect(testBundle.name == "name-stub")
+  @Suite struct ValidInfoDictionary: AARBundleTestsSuite {
+    private let testInfoDictionary: [String: String] = Dictionary(
+      uniqueKeysWithValues: [
+        "AARDocumentationUrl",
+        "AARLaunchAgentLabel",
+        "CFBundleName",
+        "CFBundleShortVersionString",
+        "CFBundleVersion"
+      ].map { key in
+        (key, UUID().uuidString)
+      }
+    )
+
+    let testBundle: AARBundle
+
+    init() {
+      testBundle = .init(for: BundleMock(withInfoDictionary: testInfoDictionary))
     }
 
-    @Test func version() {
-      #expect(testBundle.version == "version-stub")
-    }
-
-    @Test func buildNumber() {
-      #expect(testBundle.buildNumber == "build-number-stub")
-    }
-
-    @Test func launchAgentPlist() {
-      #expect(testBundle.launchAgentPlist == "launch-agent-plist-stub")
-    }
-
-    @Test func docsUrl() {
-      #expect(testBundle.docsUrl == "docs-url-stub")
+    @Test func testValues() {
+      #expect(testBundle.name == testInfoDictionary["CFBundleName"])
+      #expect(testBundle.version == testInfoDictionary["CFBundleShortVersionString"])
+      #expect(testBundle.buildNumber == testInfoDictionary["CFBundleVersion"])
+      #expect(testBundle.launchAgentLabel == testInfoDictionary["AARLaunchAgentLabel"])
+      #expect(testBundle.docsUrl == testInfoDictionary["AARDocumentationUrl"])
     }
   }
 
-  @Suite struct ValuesDoNotExist {
-    private let testBundle: AARBundle = .init(infoDictionary: [:])
-    private let unknownValue: String = "unknown"
+  @Suite struct InvalidInfoDictionary: AARBundleTestsSuite {
+    private let unknownValueStub: String = "unknown-stub"
 
-    @Test func name() {
-      #expect(testBundle.name == unknownValue)
+    let testBundle: AARBundle
+
+    init() {
+      testBundle = .init(
+        for: BundleMock(withInfoDictionary: [:]),
+        unknownValueFallback: unknownValueStub
+      )
     }
 
-    @Test func version() {
-      #expect(testBundle.version == unknownValue)
-    }
-
-    @Test func buildNumber() {
-      #expect(testBundle.buildNumber == unknownValue)
-    }
-
-    @Test func launchAgentPlist() {
-      #expect(testBundle.launchAgentPlist == unknownValue)
-    }
-
-    @Test func docsUrl() {
-      #expect(testBundle.docsUrl == unknownValue)
+    @Test func testValues() {
+      #expect(testBundle.name == unknownValueStub)
+      #expect(testBundle.version == unknownValueStub)
+      #expect(testBundle.buildNumber == unknownValueStub)
+      #expect(testBundle.launchAgentLabel == unknownValueStub)
+      #expect(testBundle.docsUrl == unknownValueStub)
     }
   }
 }

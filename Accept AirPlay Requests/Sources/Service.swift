@@ -1,94 +1,160 @@
+import AppKit.NSRunningApplication
+import Foundation.NSProcessInfo
 import ServiceManagement.SMAppService
 
-public struct AARServiceManager: AARLoggable {
-  private let agent: SMAppService = .agent(plistName: AARBundle().launchAgentPlist)
-
+public struct AARServiceManager: Sendable, AARLoggable {
   @frozen public enum AgentError: Error {
-    case invalidStatus
+    case running(SMAppService.Status)
+    case notRunning(SMAppService.Status)
   }
 
   public typealias Result = Swift.Result<Void, AgentError>
 
-  public func ensureAgentStatus() async -> Result {
-    logger.debug("ensuring agent status")
+  private var agentPlist: String { AARBundle().launchAgentLabel + ".plist" }
+  private var agent: SMAppService { .agent(plistName: agentPlist) }
+  private var isAgentEnabled: Bool { agent.status == .enabled }
 
-    switch agent.status {
-      case .enabled:
-        logger.debug("service status enabled")
-        return .success(())
-
-      case .requiresApproval:
-        logger.error("service status disabled")
-        await handleAgentDisabled()
-        break
-
-      default:
-        logger.error("service status \(agent.status.rawValue)")
-        await handleAgentRegistration()
-        break
-    }
-
-    return .failure(.invalidStatus)
+  public var isAgentRunningEnabled: Bool {
+    ProcessInfo.processInfo.isLaunchAgent && isAgentEnabled
   }
 
-  private func handleAgentDisabled() async {
-    await alertAgentError(
-      error: "Background process not allowed",
-      message:
-        "This app needs permission to run in the background in order to accept incoming AirPlay notifications on this computer.\nPlease go to System Settings > General > Login Items to allow it."
+  public func ensureAgentStatus() async -> Result {
+    logger.debug("ensuring launch agent status")
+
+    let initialStatus = agent.status
+
+    guard !ProcessInfo.processInfo.isLaunchAgent else {
+      logger.debug("instance running as agent")
+
+      switch initialStatus {
+        case .enabled:
+          logger.debug("agent status enabled")
+          NSRunningApplication.current.terminateDuplicateInstances(self)
+          return .success(())
+
+        default:
+          logger.error("agent status not enabled")
+          do { try handleAgentRegister() } catch { break }
+          if isAgentEnabled {
+            logger.debug("agent re-registered and enabled")
+            return .success(())
+          }
+      }
+
+      return .failure(.running(agent.status))
+    }
+
+    logger.debug("instance not running as agent")
+
+    switch initialStatus {
+      case .requiresApproval:
+        logger.debug("agent status disabled")
+        await displayAgentDisabledError()
+        break
+
+      case .enabled:
+        logger.debug("agent status enabled")
+        fallthrough
+
+      case .notRegistered:
+        logger.debug("agent status not registered")
+        fallthrough
+
+      case .notFound:
+        logger.debug("agent status not found")
+        fallthrough
+
+      default:
+        try? await handleAgentUnregister()
+
+        do {
+          try handleAgentRegister()
+        } catch let registrationError {
+          if !isAgentEnabled {
+            await displayAgentRegistrationError(cause: registrationError)
+          }
+        }
+
+        if isAgentEnabled {
+          await displayAgentEnabledRegisteredInfo()
+        }
+    }
+
+    return .failure(.notRunning(agent.status))
+  }
+
+  private func handleAgentRegister() throws {
+    do {
+      logger.debug("attempting agent register")
+      try agent.register()
+    } catch let error {
+      logger.error("failed registering agent: \(error.localizedDescription, privacy: .public)")
+      throw error
+    }
+  }
+
+  private func handleAgentUnregister() async throws {
+    do {
+      logger.debug("attempting agent unregister")
+      try await agent.unregister()
+    } catch let error {
+      logger.warning("failed unregistering agent: \(error.localizedDescription, privacy: .public)")
+      throw error
+    }
+  }
+
+  public func displayAgentRunningEnabledInfo() async {
+    await displayAgentInfo(
+      info: "App running in the background",
+      message: "This application is currently already running as a background process, waiting for AirPlay requests to accept.\nTo manage it go to System Settings > General > Login Items (click the second button below)."
     )
   }
 
-  private func handleAgentRegistration() async {
-    logger.debug("trying agent registration")
-
-    do {
-      // @TODO if status != .notRegistered try? await agent.unregister() first
-      // @TODO if status = .requiresApproval provide a button way to unregister
-      try agent.register()
-
-      logger.info("registration succeeded")
-    } catch let error {
-      logger.error("registration failed (\(error.localizedDescription, privacy: .public))")
-
-      await alertAgentError(
-        error: "Launch Agent registration failed",
-        message:
-          "This app was unable to register the service to manage the background process.\nPlease check in System Settings > General > Login Items if it's already been registered, or try again after a system reboot.",
-        cause: error
-      )
-    }
+  private func displayAgentEnabledRegisteredInfo() async {
+    await displayAgentInfo(
+      info: "Background process registered",
+      message: "This application will now run in the background, waiting for AirPlay requests to accept.\nTo manage it, and turn off the auto-launch at login, go to System Settings > General > Login Items (click the second button below)."
+    )
   }
 
-  private func alertAgentError(
-    error: String,
-    message: String,
-    cause: (any Error)? = nil
-  ) async {
-    var details = "Service Status = \(agent.status.rawValue)"
-    if let cause {
-      details += "; Internal Error = \"\(cause.localizedDescription)\""
-    }
-
-    if await AARAlert.display(
-      style: .critical,
-      title: error,
-      message: "\(message)\n[ \(details) ]",
-      okButtonTitle: "Open Login Items Settings",
-      cancelButtonTitle: "Quit"
-    ) == .OK {
+  private func displayAgentInfo(info: String, message: String) async {
+    if await AARAlert(
+      style: .informational,
+      title: info,
+      message: message,
+      buttons: ["OK", "Open Login Items Settings"]
+    ).run() == .button2 {
       SMAppService.openSystemSettingsLoginItems()
     }
   }
 
-  static public func alertAgentInfo() async {
-    if await AARAlert.display(
-      style: .informational,
-      title: "Application running in the background",
-      message: "This app is currently already running as a background process, waiting for AirPlay notifications requests to accept.\nTo manage this process, or prevent it from automatically start when you log in, open System Settings > General > Login Items.",
-      okButtonTitle: "Got it",
-      cancelButtonTitle: "Open Login Items Settings"
-    ) == .cancel {
+  private func displayAgentDisabledError() async {
+    await displayAgentError(
+      error: "Background process disabled",
+      message: "This app needs permission to run in the background in order to accept incoming AirPlay requests.\nPlease go to System Settings > General > Login Items to allow it."
+    )
+  }
+
+  private func displayAgentRegistrationError(cause: any Error) async {
+    await displayAgentError(
+      error: "Background process registration failed",
+      message: "This app was unable to register the service to run as a background process.\nPlease check in System Settings > General > Login Items if it's already been registered, or try again after a system reboot.",
+      cause: cause
+    )
+  }
+
+  private func displayAgentError(error: String, message: String, cause: Error? = nil) async {
+    var message = message
+    if let cause {
+      message += "\n( Error: \"\(cause.localizedDescription)\" )"
+    }
+
+    if await AARAlert(
+      style: .critical,
+      title: error,
+      message: message,
+      buttons: ["Open Login Items Settings", "Cancel"]
+    ).run() == .button1 {
       SMAppService.openSystemSettingsLoginItems()
     }
   }
