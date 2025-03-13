@@ -1,4 +1,24 @@
-# (Auto) Accept AirPlay Requests
+<div align="center">
+  <picture><img src="https://raw.githubusercontent.com/duddu/auto-accept-airplay-requests/refs/heads/latest/Docs/assets/logo.png" alt="Logo" title="(Auto) Accept AirPlay Requests" align="middle" width="100" /></picture>
+
+  # [(Auto) Accept AirPlay Requests](https://auto-accept-airplay-requests.duddu.dev)
+
+  [RELEASE_BADGE]: https://img.shields.io/github/v/release/duddu/auto-accept-airplay-requests?logo=github&logoColor=white
+  [SWIFT_BADGE]: https://img.shields.io/badge/swift-v6.0.3-de5d43?logo=swift&logoColor=white
+  [ANALYZE_BADGE]: https://img.shields.io/github/actions/workflow/status/duddu/auto-accept-airplay-requests/analyze.yml?logo=github&logoColor=white&label=codeql
+  [ANALYZE_WORKFLOW]: https://github.com/duddu/auto-accept-airplay-requests/actions/workflows/analyze.yml
+  [TEST_BADGE]: https://img.shields.io/github/actions/workflow/status/duddu/auto-accept-airplay-requests/test.yml?logo=github&logoColor=white&label=tests
+  [TEST_WORKFLOW]: https://github.com/duddu/auto-accept-airplay-requests/actions/workflows/test.yml
+  [DOCS_BADGE]: https://img.shields.io/github/actions/workflow/status/duddu/auto-accept-airplay-requests/docs.yml?logo=github&logoColor=white&label=vuepress
+  [DOCS_WORKFLOW]: https://github.com/duddu/auto-accept-airplay-requests/actions/workflows/docs.yml
+
+  [![GitHub Latest Release][RELEASE_BADGE]](https://github.com/duddu/auto-accept-airplay-requests/releases/latest)
+  [![Swift Version][SWIFT_BADGE]](#)
+  [![GitHub Actions Analyze Status][ANALYZE_BADGE]][ANALYZE_WORKFLOW]
+  [![GitHub Actions Test Status][TEST_BADGE]][TEST_WORKFLOW]
+  [![GitHub Actions Docs Status][DOCS_BADGE]][DOCS_WORKFLOW]
+</div>
+<br>
 
 <!-- #region content -->
 <picture>
@@ -10,22 +30,23 @@ A lightweight, single-purpose macOS app that automatically allows other devices 
 
 ## Feature Highlights
 
-- Seriously lightweight with **minimal resource consumption**
-- Written in **Swift 6**, built as executable with no persisted state
-- Operates as a low-priority, self-healing **background process**
-- Auto-starts on login via registered **Launch Agent** (can be disabled)
-- Ensures **security permissions** and gracefully handles their absence
+- Minimal **resource consumption**, meant to run forever with no impact
+- Written in **Swift 6**, built as executable with no dependencies 
+- Operates as a low-priority, self-recovering **background process**
+- Auto-starts on login as registered **Launch Agent** (can be disabled)
+- Ensures required **permissions** and gracefully handles their absence
 
 ## Get Started
 
-- Download the [latest release](https://github.com/duddu/auto-accept-airplay-requests/releases/latest) archive asset.
-- Extract the application (`Accept AirPlay Requests.app`) and move it to your preferred folder (e.g. `/Applications` or `/Users/YourUser/Applications`).
-- Double-click the app icon. At first launch an alert will guide you to grant the required permissions.
+- Download the app from the [latest release](https://github.com/duddu/auto-accept-airplay-requests/releases/latest) assets.
+- Move the application bundle ("Accept AirPlay Requests.app") to your preferred folder (e.g. /Applications or /Users/YourUser/Applications).
+- Double click to open the app; an alert will instruct you how to grant the required permission.
 
-The application will now run in the background (i.e. no active icon on your Dock), and will only bother you in case your action is needed (e.g. permissions revoked).
+> [!IMPORTANT]
+> The first time you open the application, macOS will warn you that it comes from an **unidentified developer** (i.e. not enrolled in the -bit pricey- Apple Developer program). To proceed, you will need to open *System Settings > Privacy & Security*, scroll to the bottom and click the **[Open Anyway](https://support.apple.com/en-us/102445#openanyway)** button.  
+> By the way, you can always check the authenticity of the application bundle by verifying its **code signature**—instructions are included in each release note.
 
-> [!TIP]
-> The first time you open the application, macOS will warn you that it comes **from an unidentified developer** (i.e. not enrolled in Apple Developer program for $99/yr). To proceed, you need to open System Settings > Privacy & Security, scroll down and **click on [Open Anyway](https://support.apple.com/en-us/102445#openanyway)**. By the way,you can  always check the authenticity of the application bundle by verifying its **code signature**—instructions included in the release notes.
+After the initial setup, the application will now run in the background (i.e. no visible icon on your Dock), and will only bother you in case your action is needed (e.g. a needed permission was revoked).
 
 ## Use cases
 
@@ -40,35 +61,41 @@ This happens even if you both are **on the same network**, even if you **previou
 </picture>
 
 > [!NOTE]
-> This behavior is not affected by the option you selected in System Settings > General > AirDrop & Handoff > **Allow AirPlay for**—that setting (albeit still needed) only determines which devices will be able to *detect* your Mac as an AirPlay receiver.
+> This behavior is not affected by the option you selected in *System Settings > General > AirDrop & Handoff > **Allow AirPlay for***. That setting (albeit still required) only determines which devices will be able to *detect* your Mac as an AirPlay receiver.
 
 ## Usage & Configuration
 
-### Security
+### Privacy & Security
 
 <picture>
   <source media="(min-width: 980px)" srcset="https://raw.githubusercontent.com/duddu/auto-accept-airplay-requests/refs/heads/latest/Docs/assets/accessibility-permission.png 2x" />
   <img align="right" alt="Accessibility permission" src="https://raw.githubusercontent.com/duddu/auto-accept-airplay-requests/refs/heads/latest/Docs/assets/empty.png" />
 </picture>
 
-The only required security permission is System Settings > Privacy & Security > **Accessibility** (needed to emulate clicking the *Accept* button on AirPlay request notifications). The app automatically checks if this permission has been granted and provides instructions if not.
+The only required permission is in *System Settings > Privacy & Security > **Accessibility***. It's needed to simulate clickling the "Accept" button on the incoming AirPlay notifications. The app ensures automatically this permission has been granted and alerts you with instructions if not.
 
-### Quit
+### Stop the background process
 
 <picture>
   <source media="(min-width: 980px)" srcset="https://raw.githubusercontent.com/duddu/auto-accept-airplay-requests/refs/heads/latest/Docs/assets/allow-in-the-background.png 2x" />
   <img align="right" alt="Allow in the Background" src="https://raw.githubusercontent.com/duddu/auto-accept-airplay-requests/refs/heads/latest/Docs/assets/empty.png" />
 </picture>
 
-After the first launch, the app runs as a background process (i.e. no active icon in the Dock). To manage it, go to System Settings > General > Login Items & Extensions > **Allow in the Background**. Disabling it there will stop the running process and prevent it from launching automatically at login.
+As the app runs in the background, to manage it you can always use the toggle in *System Settings > General > Login Items & Extensions > **Allow in the Background***. Disabling the app there will stop the background process and prevent it from auto-start on login. You can toggle it back on anytime.
 
-### Update
+### Check the app is running
 
-To update the app to a different [release version](https://github.com/duddu/auto-accept-airplay-requests/releases), you must first [quit](#quit) the running background process. Then, simply replace the existing application bundle (`Accept AirPlay Requests.app`) and re-enable the background process.
+If at anytime you want to check the app is running in the background as expected (after checking it's toggled on in *System Settings > General > Login Items & Extensions > **Allow in the Background***), you can do so by just double-click the app (as if to re-open it): an info alert with title "App running in the background" will confirm you all is working.  
+Of course, another obvious option is to look for the app name in Activity Monitor. One last is to stream the [logging](#logging) emitted by the running app.
 
-### Uninstall
+### Update the app version
 
-First [quit](#quit) the running background process, then move the application bundle (`Accept AirPlay Requests.app`) to the Trash. Any related configurations will be automatically removed from System Settings at the next reboot.
+To update the app to a different [release version](https://github.com/duddu/auto-accept-airplay-requests/releases), you must first [stop](#stop-the-background-process) the running background process. Then, simply replace the existing application bundle ("Accept AirPlay Requests.app") and re-enable the background process.  
+After that re-open the app file just to [check it's running](#check-the-app-is-running) - if a macOS alert pops up telling you the app cannot be opened as coming from an unidentified developer, please refer to the "Important" info box in the [Get Started](#get-started) section.
+
+### Uninstall the app
+
+First [stop](#stop-the-background-process) the running background process, then move the application bundle ("Accept AirPlay Requests.app") to the Trash. Any configuration related to this app will be automatically removed from System Settings after the next system reboot.
 
 ## Development
 
@@ -79,6 +106,6 @@ Feel free to report any issue or suggest an enhancement. Any contribution is mor
 Run the following command from your terminal to live-stream all logs emitted by the app:
 
 ```sh
-log stream --predicate 'subsystem CONTAINS "dev.duddu.AcceptAirPlayRequests"' --level debug --style compact
+log stream --predicate 'subsystem CONTAINS "dev.duddu.AcceptAirPlayRequests"' --level debug
 ```
 <!-- #endregion content -->
