@@ -12,7 +12,7 @@
     "update-deps": "npx vp-update"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.38.5"
+    "@dotenvx/dotenvx": "^1.39.0"
   },
   "devDependencies": {
     "@vuepress/bundler-webpack": "2.0.0-rc.20",
