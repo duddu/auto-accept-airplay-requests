@@ -30,9 +30,9 @@ jobs:
       DOCS_DIR: ${{ github.workspace }}/Docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -45,7 +45,7 @@ jobs:
         run: npm run build
       - if: github.event_name == 'push'
         name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ env.DOCS_DIR }}/.vuepress/dist
 
