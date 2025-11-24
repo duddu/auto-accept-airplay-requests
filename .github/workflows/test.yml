@@ -37,7 +37,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Setup Swift ${{ env.SWIFT_VERSION }}
-        uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240
+        uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a
         with:
           swift-version: ${{ env.SWIFT_VERSION }}
       - name: Test Swift Package
